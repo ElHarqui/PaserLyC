@@ -17,20 +17,19 @@ int main()
   		regex reserved_words_regex("\\b(PARA|SI|MIENTRAS|PARA|PRINCIPAL)\\b", regex_constants::ECMAScript | regex_constants::icase);
 	    
 	    // Expresión regular para buscar la frase "REGULAR EXPRESSIONS" (insensible a mayúsculas y minúsculas)
-	    regex self_regex("REGULAR EXPRESSIONS",
-	                     regex_constants::ECMAScript | regex_constants::icase);
-	
+	    regex self_regex("REGULAR EXPRESSIONS", regex_constants::ECMAScript | regex_constants::icase);
 	    // Busca la expresión regular en la cadena de texto
 	    if (regex_search(s, self_regex))
-	        cout << "El texto contiene la frase 'regular expressions'\n";
-	
+		{
+	    	cout << "El texto contiene la frase 'regular expressions'\n";	
+		}
+	        
 	    // Expresión regular para encontrar palabras en la cadena de texto
 	    regex word_regex("(\\w+)");
 	
 	    // Inicializa un iterador para buscar todas las palabras en la cadena de texto
-	    auto words_begin =
-	        sregex_iterator(s.begin(), s.end(), word_regex);
-	    auto words_end = sregex_iterator();
+	    auto words_begin = sregex_iterator(s.begin(), s.end(), word_regex);
+	    auto words_end	 = sregex_iterator();
 	
 	    // Imprime el número total de palabras encontradas en la cadena de texto
 	    cout << "Encontramos "
@@ -47,7 +46,10 @@ int main()
 	        smatch match = *i;
 	        string match_str = match.str();
 	        if (match_str.size() > N)
-	            cout << "  " << match_str << '\n';
+	        {
+	        	cout << "  " << match_str << '\n';
+			}
+	            
 	    }
 	
 	    // Expresión regular para encontrar palabras con más de 6 caracteres

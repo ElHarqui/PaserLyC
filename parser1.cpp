@@ -10,7 +10,11 @@ int main()
     while(1){
 	    	// Cadena de texto de ejemplo
 	    string s; 
-	    cout << "->> "; cin>>s;
+	    cout<< "-->";
+	    getline(cin,s);
+	    
+	    // Expresión regular para buscar palabras reservadas (insensible a mayúsculas y minúsculas)
+  		regex reserved_words_regex("\\b(PARA|SI|MIENTRAS|PARA|PRINCIPAL)\\b", regex_constants::ECMAScript | regex_constants::icase);
 	    
 	    // Expresión regular para buscar la frase "REGULAR EXPRESSIONS" (insensible a mayúsculas y minúsculas)
 	    regex self_regex("REGULAR EXPRESSIONS",

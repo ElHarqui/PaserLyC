@@ -2,20 +2,34 @@
 #include <iterator>   // Para iteradores
 #include <regex>      // Para expresiones regulares
 #include <string>     // Para cadenas de texto
-#include "Palabras_Reservadas.h" //Palabras Reservadas
+//#include "Palabras_Reservadas.h" //Palabras Reservadas
 
 using namespace std; // Usa el espacio de nombres std por conveniencia
 
 int main()
 {
     while(1){
+    	//DECLARACION DE PALABRAS RESERVADAS
+		const string Reserverd_Words 	= 	"\\bPARA|SI|MIENTRAS|PARA|PRINCIPAL\\b";
+		const string Parentesis_Chars 	= 	"\\b\\(?((([a-zA-Z])\\w\\s,)*(([a-zA-Z])\\w)\\)\\b";
 	    // Cadena de texto de ejemplo
 	    string s; 
 	    cout<< "-->";
 	    getline(cin,s);
 	    
 	    // Expresión regular para buscar palabras reservadas (insensible a mayúsculas y minúsculas)
-  		regex reserved_words_regex("\\b("+Reserverd_Words+")\\b", regex_constants::ECMAScript | regex_constants::icase);
+  		regex reserved_words_regex(Reserverd_Words, regex_constants::ECMAScript | regex_constants::icase);
+  		if (regex_search(s, reserved_words_regex))
+  		{
+  			cout<< "\tPalabras reservadas encontradas :\n";
+		  }
+		 // Inicializa un iterador para buscar todas las palabras en la cadena de texto
+	    auto words_begin = sregex_iterator(s.begin(), s.end(), reserved_words_regex);
+	    auto words_end	 = sregex_iterator();
+	    // Imprime el número total de palabras encontradas en la cadena de texto
+	    cout << distance(words_begin, words_end)<< "\n";
+		/*
+		auto words_inicio =
 	    
 	    // Expresión regular para buscar la frase "REGULAR EXPRESSIONS" (insensible a mayúsculas y minúsculas)
 	    regex self_regex("REGULAR EXPRESSIONS", regex_constants::ECMAScript | regex_constants::icase);
@@ -24,7 +38,8 @@ int main()
 		{
 	    	cout << "El texto contiene la frase 'regular expressions'\n";	
 		}
-	        
+	      
+		    
 	    // Expresión regular para encontrar palabras en la cadena de texto
 	    regex word_regex("(\\w+)");
 	
@@ -55,12 +70,13 @@ int main()
 	
 	    // Expresión regular para encontrar palabras con más de 6 caracteres
 	    regex long_word_regex("(\\w{7,})");
-	
+			
 	    // Reemplaza las palabras largas con el formato "[palabra]" en la cadena de texto
 	    string new_s = regex_replace(s, long_word_regex, "[$&]");
-	
+		
 	    // Imprime la cadena de texto modificada
 	    cout << new_s << '\n';
+	    */
 	}
 
     return 0; // Indica que la ejecución del programa terminó correctamente

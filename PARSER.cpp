@@ -9,7 +9,7 @@ void Imprimir_Palabras_Regex(string s, regex chars_regex);
 int main() {
     while (1) {
         // DECLARACION DE PALABRAS RESERVADAS
-        const string Reserved_Words 	= "\\b(PARA|SI|MIENTRAS|PRINCIPAL)\\b";
+        const string Reserved_Words 	= "\\b(PARA|SI|MIENTRAS|PRINCIPAL)";
         const string Parentesis_Chars 	= "\\(\\s*(([a-zA-Z]\\w*)\\s?,\\s?)*([a-zA-Z]\\w*)\\s*\\)";
         
         // Cadena de texto de ejemplo
@@ -20,18 +20,16 @@ int main() {
         // Expresión regular para buscar palabras reservadas (insensible a mayúsculas y minúsculas)
         regex reserved_words_regex(Reserved_Words, regex_constants::ECMAScript | regex_constants::icase);
         if (regex_search(s, reserved_words_regex)) {
-            cout << "\tPalabras reservadas encontradas :\n";
-            Imprimir_Palabras_Regex(s, reserved_words_regex);
+            cout << "\tPalabras reservadas encontradas :\n"; 
         }
-
+		Imprimir_Palabras_Regex(s, reserved_words_regex);
+		
         // Expresión regular para buscar caracteres en paréntesis (insensible a mayúsculas y minúsculas)
         regex parentesis_chars_regex(Parentesis_Chars, regex_constants::ECMAScript | regex_constants::icase);
         if (regex_search(s, parentesis_chars_regex)) {
-            cout << "\tParéntesis encontrados :\n";
-            Imprimir_Palabras_Regex(s, parentesis_chars_regex);
+            cout << "\tParéntesis encontrados :\n";          
         }
-            Imprimir_Palabras_Regex(s, parentesis_chars_regex);
-
+		Imprimir_Palabras_Regex(s, parentesis_chars_regex);
     }
 
     return 0; // Indica que la ejecución del programa terminó correctamente

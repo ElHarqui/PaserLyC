@@ -28,6 +28,12 @@ int main()
 	    auto words_end	 = sregex_iterator();
 	    // Imprime el número total de palabras encontradas en la cadena de texto
 	    cout << distance(words_begin, words_end)<< "\n";
+	
+    	for (sregex_iterator i = words_begin; i != words_end; ++i) {
+        smatch match = *i;
+        cout << "  " << match.str() << " "; // Imprime cada palabra encontrada
+   		 }
+   		cout <<"\n";
 		/*
 		auto words_inicio =
 	    

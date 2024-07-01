@@ -1,53 +1,53 @@
+#include "Parser.h"
 #include <iostream>
-#include <regex>
-#include <string>
 
-using namespace std;
+Parser::Parser(const vector<Token>& tokens, SymbolTable& symTable) 
+    : tokens(tokens), pos(0), symTable(symTable) {}
 
-void Imprimir_Palabras_Regex(string s, regex chars_regex);
-
-int main() {
-    while (1) {
-        // DECLARACION DE PALABRAS RESERVADAS
-        const string Reserved_Words 	= "\\b(PARA|SI|MIENTRAS|PRINCIPAL)";
-        const string Parentesis_Chars 	= "\\(\\s*(([a-zA-Z]\\w*)\\s?,\\s?)*([a-zA-Z]\\w*)\\s*\\)";
-        
-        // Cadena de texto de ejemplo
-        string s;
-        cout << "-->";
-        getline(cin, s);
-
-        // Expresión regular para buscar palabras reservadas (insensible a mayúsculas y minúsculas)
-        regex reserved_words_regex(Reserved_Words, regex_constants::ECMAScript | regex_constants::icase);
-        if (regex_search(s, reserved_words_regex)) {
-            cout << "\tPalabras reservadas encontradas :\n"; 
+void Parser::parse() {
+    while (pos < tokens.size() && tokens[pos].type != TokenType::END) {
+        if (tokens[pos].type == TokenType::KEYWORD && tokens[pos].value == "return") {
+            parseReturnStatement();
+        } else if (tokens[pos].type == TokenType::IDENTIFIER) {
+            parseAssignment();
+        } else {
+            parseExpression();
         }
-		Imprimir_Palabras_Regex(s, reserved_words_regex);
-		
-        // Expresión regular para buscar caracteres en paréntesis (insensible a mayúsculas y minúsculas)
-        regex parentesis_chars_regex(Parentesis_Chars, regex_constants::ECMAScript | regex_constants::icase);
-        if (regex_search(s, parentesis_chars_regex)) {
-            cout << "\tParéntesis encontrados :\n";          
-        }
-		Imprimir_Palabras_Regex(s, parentesis_chars_regex);
     }
-
-    return 0; // Indica que la ejecución del programa terminó correctamente
 }
 
-void Imprimir_Palabras_Regex(string s, regex chars_regex) {
-    // Inicializa un iterador para buscar todas las palabras en la cadena de texto
-    sregex_iterator words_begin(s.begin(), s.end(), chars_regex);
-    sregex_iterator words_end;
-    
-    // Imprime el número total de palabras encontradas en la cadena de texto
-    cout << distance(words_begin, words_end) << "\n";
-
-    for (sregex_iterator i = words_begin; i != words_end; ++i) {
-        smatch match = *i;
-        cout << "  " << match.str() << " "; // Imprime cada palabra encontrada
+void Parser::parseReturnStatement() {
+    ++pos;  // Consumir 'return'
+    parseExpression();
+    if (tokens[pos].type == TokenType::OPERATOR && tokens[pos].value == ";") {
+        ++pos;  // Consumir ';'
+    } else {
+        cerr << "Error: Expected ';' after return statement" << endl;
     }
-    cout << "\n";
 }
 
+void Parser::parseAssignment() {
+    string varName = tokens[pos].value;
+    ++pos;  // Consumir el identificador
+    if (tokens[pos].type == TokenType::OPERATOR && tokens[pos].value == "=") {
+        ++pos;  // Consumir '='
+        parseExpression();
+        symTable.addSymbol(varName, "int"); // Añadir símbolo a la tabla con tipo 'int'
+        if (tokens[pos].type == TokenType::OPERATOR && tokens[pos].value == ";") {
+            ++pos;  // Consumir ';'
+        } else {
+            cerr << "Error: Expected ';' after assignment" << endl;
+        }
+    } else {
+        cerr << "Error: Expected '=' in assignment" << endl;
+    }
+}
+
+void Parser::parseExpression() {
+    if (tokens[pos].type == TokenType::NUMBER || tokens[pos].type == TokenType::IDENTIFIER) {
+        ++pos;  // Consumir número o identificador
+    } else {
+        cerr << "Error: Expected expression" << endl;
+    }
+}
 

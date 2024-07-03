@@ -1,53 +1,78 @@
 #include "Parser.h"
 #include <iostream>
 
-Parser::Parser(const vector<Token>& tokens, SymbolTable& symTable) 
-    : tokens(tokens), pos(0), symTable(symTable) {}
+Parser::Parser(const std::vector<Token>& tokens) : tokens(tokens), pos(0) {}
 
-void Parser::parse() {
-    while (pos < tokens.size() && tokens[pos].type != TokenType::END) {
-        if (tokens[pos].type == TokenType::KEYWORD && tokens[pos].value == "return") {
-            parseReturnStatement();
-        } else if (tokens[pos].type == TokenType::IDENTIFIER) {
-            parseAssignment();
-        } else {
-            parseExpression();
+std::shared_ptr<ASTNode> Parser::parse() {
+    auto root = std::make_shared<ASTNode>(ASTNodeType::PROGRAM, "program");
+    while (!isAtEnd()) {
+        root->addChild(parseStatement());
+    }
+    return root;
+}
+
+std::shared_ptr<ASTNode> Parser::parseStatement() {
+    if (match(TokenType::KEYWORD)) {
+        auto type = advance();
+        auto identifier = advance();
+        if (match(TokenType::OPERATOR, ";")) {
+            advance();
+            return std::make_shared<ASTNode>(ASTNodeType::VARIABLE_DECLARATION, identifier.value);
+        }
+    } else if (match(TokenType::IDENTIFIER)) {
+        auto identifier = advance();
+        if (match(TokenType::OPERATOR, "=")) {
+            advance();
+            auto expr = parseExpression();
+            if (match(TokenType::OPERATOR, ";")) {
+                advance();
+                auto node = std::make_shared<ASTNode>(ASTNodeType::ASSIGNMENT, identifier.value);
+                node->addChild(expr);
+                return node;
+            }
         }
     }
+    std::cerr << "Error: Expected statement" << std::endl;
+    return nullptr;
 }
 
-void Parser::parseReturnStatement() {
-    ++pos;  // Consumir 'return'
-    parseExpression();
-    if (tokens[pos].type == TokenType::OPERATOR && tokens[pos].value == ";") {
-        ++pos;  // Consumir ';'
-    } else {
-        cerr << "Error: Expected ';' after return statement" << endl;
+std::shared_ptr<ASTNode> Parser::parseExpression() {
+    auto left = parsePrimary();
+    while (match(TokenType::OPERATOR, "+") || match(TokenType::OPERATOR, "-") ||
+           match(TokenType::OPERATOR, "*") || match(TokenType::OPERATOR, "/")) {
+        Token op = advance();
+        auto right = parsePrimary();
+        auto node = std::make_shared<ASTNode>(ASTNodeType::BINARY_OP, op.value);
+        node->addChild(left);
+        node->addChild(right);
+        left = node;
     }
+    return left;
 }
 
-void Parser::parseAssignment() {
-    string varName = tokens[pos].value;
-    ++pos;  // Consumir el identificador
-    if (tokens[pos].type == TokenType::OPERATOR && tokens[pos].value == "=") {
-        ++pos;  // Consumir '='
-        parseExpression();
-        symTable.addSymbol(varName, "int"); // Añadir símbolo a la tabla con tipo 'int'
-        if (tokens[pos].type == TokenType::OPERATOR && tokens[pos].value == ";") {
-            ++pos;  // Consumir ';'
-        } else {
-            cerr << "Error: Expected ';' after assignment" << endl;
-        }
-    } else {
-        cerr << "Error: Expected '=' in assignment" << endl;
+std::shared_ptr<ASTNode> Parser::parsePrimary() {
+    if (match(TokenType::NUMBER)) {
+        return std::make_shared<ASTNode>(ASTNodeType::NUMBER, advance().value);
+    } else if (match(TokenType::IDENTIFIER)) {
+        return std::make_shared<ASTNode>(ASTNodeType::IDENTIFIER, advance().value);
     }
+    std::cerr << "Error: Expected primary expression" << std::endl;
+    return nullptr;
 }
 
-void Parser::parseExpression() {
-    if (tokens[pos].type == TokenType::NUMBER || tokens[pos].type == TokenType::IDENTIFIER) {
-        ++pos;  // Consumir número o identificador
-    } else {
-        cerr << "Error: Expected expression" << endl;
-    }
+Token Parser::advance() {
+    return tokens[pos++];
+}
+
+Token Parser::peek() const {
+    return tokens[pos];
+}
+
+bool Parser::match(TokenType type, const std::string& value) {
+    return !isAtEnd() && peek().type == type && (value.empty() || peek().value == value);
+}
+
+bool Parser::isAtEnd() const {
+    return pos >= tokens.size();
 }
 

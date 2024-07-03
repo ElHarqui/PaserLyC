@@ -12,8 +12,6 @@ vector<Token> Lexer::tokenize() {
             tokens.push_back(lexNumber());
         } else if (isalpha(currentChar)) {
             tokens.push_back(lexIdentifier());
-        } else if (currentChar == ';') {
-            tokens.push_back({TokenType::SEMICOLON, string(1, advance())});
         } else {
             tokens.push_back(lexOperator());
         }
@@ -47,7 +45,7 @@ Token Lexer::lexIdentifier() {
     while (!isAtEnd() && (isalnum(peek()) || peek() == '_')) {
         value += advance();
     }
-    if (value == "int" || value == "float" || value == "return" || value == "if" || value == "else") { // Palabras reservadas
+    if (value == "int" || value == "return" || value == "if" || value == "else") { // Palabras reservadas
         return {TokenType::KEYWORD, value};
     }
     return {TokenType::IDENTIFIER, value};
@@ -56,37 +54,33 @@ Token Lexer::lexIdentifier() {
 Token Lexer::lexOperator() {
     char currentChar = advance();
     switch (currentChar) {
-        case '(':
-        case ')':
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-        case '=':
+        case '(': case ')':
+        case '+': case '-':
+        case '*': case '/':
+        case '=': case ';':
+        case '>': case '<':
             return {TokenType::OPERATOR, string(1, currentChar)};
-        case '>':
-            if (!isAtEnd() && peek() == '=') {
-                advance();
-                return {TokenType::OPERATOR, ">="};
-            }
-            return {TokenType::OPERATOR, ">"};
-        case '<':
-            if (!isAtEnd() && peek() == '=') {
-                advance();
-                return {TokenType::OPERATOR, "<="};
-            }
-            return {TokenType::OPERATOR, "<"};
         case '!':
             if (!isAtEnd() && peek() == '=') {
                 advance();
                 return {TokenType::OPERATOR, "!="};
             }
-            return {TokenType::UNKNOWN, string(1, currentChar)};
-        default:
-            return {TokenType::UNKNOWN, string(1, currentChar)};
+            break;
+        case '>':
+            if (!isAtEnd() && peek() == '=') {
+                advance();
+                return {TokenType::OPERATOR, ">="};
+            }
+            break;
+        case '<':
+            if (!isAtEnd() && peek() == '=') {
+                advance();
+                return {TokenType::OPERATOR, "<="};
+            }
+            break;
     }
+    return {TokenType::UNKNOWN, string(1, currentChar)};
 }
-
 
 void Lexer::skipWhitespace() {
     while (!isAtEnd() && isspace(peek())) {

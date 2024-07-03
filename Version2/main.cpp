@@ -22,17 +22,13 @@ void performLexicalAnalysis(const string& source, vector<Token>& tokens) {
 
 void performSyntaxAnalysis(const vector<Token>& tokens, SymbolTable& symTable) {
     Parser parser(tokens, symTable);
-    auto ast = parser.parse();
+    parser.parse();
 
-    if (ast != nullptr) {
-        cout << "Syntax Analysis Complete" << endl;
-    } else {
-        cout << "Syntax Analysis Failed" << endl;
-    }
+    cout << "Syntax Analysis Complete" << endl;
 }
 
 int main() {
-    string source = "int a; float b; a = 1 + 2; b = a + 3.5;";
+    string source = "int main() { int x = 0; return x; }";
     vector<Token> tokens;
     SymbolTable symTable;
 

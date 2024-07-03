@@ -2,20 +2,20 @@
 #define TOKEN_H
 
 #include <string>
-using namespace std;
 
 enum class TokenType {
-    IDENTIFIER,
-    KEYWORD,
-    NUMBER,
-    OPERATOR,
-    END
+    IDENTIFIER, 
+	NUMBER, OPERATOR, 
+	KEYWORD, 
+	END_OF_FILE, 
+	UNKNOWN
 };
 
 struct Token {
     TokenType type;
-    string value;
+    std::string value;
+    Token(TokenType type, const std::string& value) : type(type), value(value) {}
 };
 
-#endif // TOKEN_H
+#endif
 

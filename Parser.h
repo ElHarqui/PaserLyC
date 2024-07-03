@@ -2,26 +2,28 @@
 #define PARSER_H
 
 #include <vector>
-#include <string>
+#include <memory>
 #include "Token.h"
-#include "SymbolTable.h"
-
-using namespace std;
+#include "ASTNode.h"
 
 class Parser {
 public:
-    Parser(const vector<Token>& tokens, SymbolTable& symTable);
-    void parse();
+    Parser(const std::vector<Token>& tokens);
+    std::shared_ptr<ASTNode> parse();
 
 private:
-    vector<Token> tokens;
-    size_t pos;
-    SymbolTable& symTable;
+    std::shared_ptr<ASTNode> parseStatement();
+    std::shared_ptr<ASTNode> parseExpression();
+    std::shared_ptr<ASTNode> parsePrimary();
 
-    void parseReturnStatement();
-    void parseAssignment();
-    void parseExpression();
+    Token advance();
+    Token peek() const;
+    bool match(TokenType type, const std::string& value = "");
+    bool isAtEnd() const;
+
+    std::vector<Token> tokens;
+    size_t pos;
 };
 
-#endif // PARSER_H
+#endif
 

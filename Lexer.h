@@ -11,17 +11,18 @@ public:
     std::vector<Token> tokenize();
 
 private:
+    std::string source;
+    size_t current;
+
     char advance();
     char peek() const;
     bool isAtEnd() const;
+    void skipWhitespace();
+
     Token lexToken();
     Token lexIdentifier();
     Token lexNumber();
     Token lexOperator();
-    void skipWhitespace();
-
-    std::string source;
-    size_t current;
 };
 
 #endif

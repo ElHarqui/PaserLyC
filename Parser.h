@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 #include "Token.h"
 #include "ASTNode.h"
 
@@ -12,6 +13,9 @@ public:
     std::shared_ptr<ASTNode> parse();
 
 private:
+    std::vector<Token> tokens;
+    size_t pos;
+
     std::shared_ptr<ASTNode> parseStatement();
     std::shared_ptr<ASTNode> parseExpression();
     std::shared_ptr<ASTNode> parsePrimary();
@@ -20,9 +24,6 @@ private:
     Token peek() const;
     bool match(TokenType type, const std::string& value = "");
     bool isAtEnd() const;
-
-    std::vector<Token> tokens;
-    size_t pos;
 };
 
 #endif

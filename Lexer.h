@@ -11,43 +11,42 @@ using namespace std;
 class Lexer {
 public:
     // Constructor que inicializa el lexer con el código fuente.
-    Lexer(const string& source);
+    Lexer(const string& source) : source(source), start(0), current(0) {}
 
-    // Función para tokenizar todo el código fuente.
-    // Devuelve un vector de objetos Token que representan los tokens en el código fuente.
+    // Función que convierte el código fuente en tokens.
     vector<Token> tokenize();
 
 private:
-    string source; // El código fuente a tokenizar.
+    string source; // El código fuente.
+    size_t start; // El inicio del lexema actual.
     size_t current; // La posición actual en el código fuente.
 
-    // Avanza la posición actual y devuelve el carácter actual.
-    char advance();
-
-    // Mira el carácter actual sin avanzar la posición.
-    char peek() const;
-
-    // Verifica si el lexer ha llegado al final del código fuente.
-    bool isAtEnd() const;
-
-    // Omite los caracteres de espacio en blanco en el código fuente.
-    void skipWhitespace();
-
-    // Lexea un solo token del código fuente.
-    // Devuelve un objeto Token que representa el token lexeado.
+    // Función que analiza el siguiente token.
     Token lexToken();
-
-    // Lexea un token identificador del código fuente.
-    // Devuelve un objeto Token que representa el identificador.
+    
+    // Función que analiza un identificador o palabra clave.
     Token lexIdentifier();
 
-    // Lexea un token de número del código fuente.
-    // Devuelve un objeto Token que representa el número.
+    // Función que analiza un número.
     Token lexNumber();
 
-    // Lexea un token de operador del código fuente.
-    // Devuelve un objeto Token que representa el operador.
+    // Función que analiza un operador.
     Token lexOperator();
+
+    // Función que salta los espacios en blanco.
+    void skipWhitespace();
+
+    // Función que verifica si hemos llegado al final del código fuente.
+    bool isAtEnd() const;
+
+    // Función que obtiene el carácter actual.
+    char advance();
+
+    // Función que obtiene el carácter actual sin avanzar.
+    char peek() const;
+
+    // Función que obtiene el siguiente carácter sin avanzar.
+    char peekNext() const;
 };
 
 #endif

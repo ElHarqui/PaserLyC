@@ -1,93 +1,88 @@
 #include "Lexer.h"
 #include <cctype>
 
-// Constructor que inicializa el lexer con el código fuente.
-Lexer::Lexer(const string& source) : source(source), current(0) {}
+using namespace std;
 
-// Función para tokenizar todo el código fuente.
-// Devuelve un vector de objetos Token que representan los tokens en el código fuente.
 vector<Token> Lexer::tokenize() {
     vector<Token> tokens;
     while (!isAtEnd()) {
-        skipWhitespace();
-        tokens.push_back(lexToken());
+        start = current;
+        Token token = lexToken();
+        if (token.type != TokenType::UNKNOWN) {
+            tokens.push_back(token);
+        }
     }
+    tokens.push_back({TokenType::END_OF_FILE, ""});
     return tokens;
 }
 
-// Avanza la posición actual y devuelve el carácter actual.
-char Lexer::advance() {
-    return source[current++];
+
+Token Lexer::lexToken() {
+    skipWhitespace();
+    if (isAtEnd()) return {TokenType::END_OF_FILE, ""};
+
+    char c = advance();
+
+    if (isalpha(c)) return lexIdentifier();
+    if (isdigit(c)) return lexNumber();
+    if (ispunct(c)) return lexOperator();
+
+    return {TokenType::UNKNOWN, string(1, c)};
 }
 
-// Mira el carácter actual sin avanzar la posición.
-char Lexer::peek() const {
-    if (isAtEnd()) return '\0';
-    return source[current];
+Token Lexer::lexIdentifier() {
+    while (isalnum(peek())) advance();
+    string value = source.substr(start, current - start);
+
+    if (value == "int" || value == "float") {
+        return {TokenType::KEYWORD, value};
+    }
+
+    return {TokenType::IDENTIFIER, value};
 }
 
-// Verifica si el lexer ha llegado al final del código fuente.
-bool Lexer::isAtEnd() const {
-    return current >= source.size();
+Token Lexer::lexNumber() {
+    while (isdigit(peek())) advance();
+    return {TokenType::NUMBER, source.substr(start, current - start)};
 }
 
-// Omite los caracteres de espacio en blanco en el código fuente.
+Token Lexer::lexOperator() {
+    char c = source[start];
+    switch (c) {
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '=':
+        case '<':
+        case '>':
+            return {TokenType::OPERATOR, string(1, c)};
+        default:
+            return {TokenType::UNKNOWN, string(1, c)};
+    }
+}
+
 void Lexer::skipWhitespace() {
     while (!isAtEnd() && isspace(peek())) {
         advance();
     }
 }
 
-// Lexea un solo token del código fuente.
-// Devuelve un objeto Token que representa el token lexeado.
-Token Lexer::lexToken() {
-    char currentChar = advance();
-    if (isalpha(currentChar)) {
-        return lexIdentifier();
-    } else if (isdigit(currentChar)) {
-        return lexNumber();
-    } else {
-        return lexOperator();
-    }
+bool Lexer::isAtEnd() const {
+    return current >= source.length();
 }
 
-// Lexea un token identificador del código fuente.
-// Devuelve un objeto Token que representa el identificador.
-Token Lexer::lexIdentifier() {
-    string value(1, source[current - 1]);
-    while (!isAtEnd() && isalnum(peek())) {
-        value += advance();
-    }
-    return Token(TokenType::IDENTIFIER, value);
+char Lexer::advance() {
+    return source[current++];
 }
 
-// Lexea un token de número del código fuente.
-// Devuelve un objeto Token que representa el número.
-Token Lexer::lexNumber() {
-    string value(1, source[current - 1]);
-    while (!isAtEnd() && isdigit(peek())) {
-        value += advance();
-    }
-    return Token(TokenType::NUMBER, value);
+char Lexer::peek() const {
+    if (isAtEnd()) return '\0';
+    return source[current];
 }
 
-// Lexea un token de operador del código fuente.
-// Devuelve un objeto Token que representa el operador.
-Token Lexer::lexOperator() {
-    char currentChar = source[current - 1];
-    switch (currentChar) {
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-        case '=':
-        case '>':
-        case '<':
-        case '(':
-        case ')':
-            return Token(TokenType::OPERATOR, string(1, currentChar));
-        default:
-            return Token(TokenType::UNKNOWN, string(1, currentChar));
-    }
+char Lexer::peekNext() const {
+    if (current + 1 >= source.length()) return '\0';
+    return source[current + 1];
 }
 

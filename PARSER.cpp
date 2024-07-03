@@ -1,79 +1,83 @@
 #include "Parser.h"
+#include <stdexcept>
 
-// Constructor que inicializa el parser con una lista de tokens.
-Parser::Parser(const vector<Token>& tokens) : tokens(tokens), current(0) {}
+using namespace std;
 
-// Función para parsear todos los tokens en un AST.
-// Devuelve un puntero compartido al nodo raíz del AST.
 shared_ptr<ASTNode> Parser::parse() {
-    return parseStatement();
+    return parseDeclaration();
 }
 
-// Función para avanzar al siguiente token.
+shared_ptr<ASTNode> Parser::parseDeclaration() {
+    if (match(TokenType::KEYWORD)) {
+        string type = tokens[current - 1].value;
+        Token name = consume(TokenType::IDENTIFIER, "Expected variable name.");
+        consume(TokenType::DELIMITER, "Expected ';' after declaration.");
+        return make_shared<ASTNode>(ASTNodeType::VARIABLE, name.value);
+    }
+    return parseExpression();
+}
+
+shared_ptr<ASTNode> Parser::parseExpression() {
+    shared_ptr<ASTNode> left = parsePrimary();
+    return parseBinaryOp(0, left);
+}
+
+shared_ptr<ASTNode> Parser::parsePrimary() {
+    if (match(TokenType::NUMBER)) {
+        return make_shared<ASTNode>(ASTNodeType::NUMBER, tokens[current - 1].value);
+    }
+    if (match(TokenType::IDENTIFIER)) {
+        return make_shared<ASTNode>(ASTNodeType::VARIABLE, tokens[current - 1].value);
+    }
+    throw runtime_error("Error: Expected expression");
+}
+
+shared_ptr<ASTNode> Parser::parseBinaryOp(int precedence, shared_ptr<ASTNode> left) {
+    while (true) {
+        if (match(TokenType::OPERATOR)) {
+            string op = tokens[current - 1].value;
+            shared_ptr<ASTNode> right = parsePrimary();
+            left = make_shared<ASTNode>(ASTNodeType::BINARY_OP, op, left, right);
+        } else {
+            break;
+        }
+    }
+    return left;
+}
+
+bool Parser::isAtEnd() const {
+    return current >= tokens.size() || tokens[current].type == TokenType::END_OF_FILE;
+}
+
 Token Parser::advance() {
     if (!isAtEnd()) current++;
     return tokens[current - 1];
 }
 
-// Función para obtener el token actual sin avanzar la posición.
 Token Parser::peek() const {
-    if (isAtEnd()) return Token(TokenType::UNKNOWN, "");
     return tokens[current];
 }
 
-// Función para verificar si el parser ha llegado al final de los tokens.
-bool Parser::isAtEnd() const {
-    return current >= tokens.size();
+Token Parser::peekNext() const {
+    if (isAtEnd()) return tokens[current];
+    return tokens[current + 1];
 }
 
-// Función para parsear una declaración.
-shared_ptr<ASTNode> Parser::parseStatement() {
-    shared_ptr<ASTNode> expr = parseExpression();
-    if (peek().type != TokenType::OPERATOR || peek().value != ";") {
-        throw runtime_error("Error: Expected ';' after expression");
-    }
-    advance(); // Consume el ';'
-    return expr;
+Token Parser::consume(TokenType type, const string& message) {
+    if (check(type)) return advance();
+    throw runtime_error(message);
 }
 
-// Función para parsear una expresión.
-shared_ptr<ASTNode> Parser::parseExpression() {
-    shared_ptr<ASTNode> left = parseTerm();
-    while (peek().type == TokenType::OPERATOR && (peek().value == "+" || peek().value == "-")) {
-        Token op = advance();
-        shared_ptr<ASTNode> right = parseTerm();
-        left = make_shared<ASTNode>(ASTNodeType::BINARY_OP, op.value, left, right);
-    }
-    return left;
+bool Parser::check(TokenType type) const {
+    if (isAtEnd()) return false;
+    return tokens[current].type == type;
 }
 
-// Función para parsear un término (parte de una expresión).
-shared_ptr<ASTNode> Parser::parseTerm() {
-    shared_ptr<ASTNode> left = parseFactor();
-    while (peek().type == TokenType::OPERATOR && (peek().value == "*" || peek().value == "/")) {
-        Token op = advance();
-        shared_ptr<ASTNode> right = parseFactor();
-        left = make_shared<ASTNode>(ASTNodeType::BINARY_OP, op.value, left, right);
+bool Parser::match(TokenType type) {
+    if (check(type)) {
+        advance();
+        return true;
     }
-    return left;
-}
-
-// Función para parsear un factor (parte de un término).
-shared_ptr<ASTNode> Parser::parseFactor() {
-    Token token = advance();
-    if (token.type == TokenType::NUMBER) {
-        return make_shared<ASTNode>(ASTNodeType::NUMBER, token.value);
-    } else if (token.type == TokenType::IDENTIFIER) {
-        return make_shared<ASTNode>(ASTNodeType::VARIABLE, token.value);
-    } else if (token.type == TokenType::OPERATOR && token.value == "(") {
-        shared_ptr<ASTNode> expr = parseExpression();
-        if (peek().type != TokenType::OPERATOR || peek().value != ")") {
-            throw runtime_error("Error: Expected ')'");
-        }
-        advance(); // Consume el ')'
-        return expr;
-    } else {
-        throw runtime_error("Error: Unexpected token");
-    }
+    return false;
 }
 

@@ -1,37 +1,63 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "Lexer.h"
 #include "Parser.h"
-#include "ASTNode.h"
 
 using namespace std;
 
-// Función para imprimir el AST (para depuración).
-void printAST(shared_ptr<ASTNode> node, int indent = 0) {
-    if (node == nullptr) return;
-    for (int i = 0; i < indent; i++) cout << "  ";
-    cout << node->value << endl;
-    printAST(node->left, indent + 1);
-    printAST(node->right, indent + 1);
+void runLexer(const string& source) {
+    Lexer lexer(source);
+    vector<Token> tokens = lexer.tokenize();
+
+    for (const Token& token : tokens) {
+        cout << "Token: " << static_cast<int>(token.type) << ", Value: " << token.value << endl;
+    }
+}
+
+void runParser(const string& source) {
+    Lexer lexer(source);
+    vector<Token> tokens = lexer.tokenize();
+
+    Parser parser(tokens);
+    shared_ptr<ASTNode> ast = parser.parse();
+
+    cout << "Syntax Analysis Complete" << endl;
+}
+
+string readFile(const string& filename) {
+    ifstream file(filename);
+    stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
 }
 
 int main() {
-    string sourceCode = "int a; float b; c = a + b;";
-    Lexer lexer(sourceCode);
-    vector<Token> tokens = lexer.tokenize();
+    int choice;
+    string filename;
 
-    cout << "Tokens:" << endl;
-    for (const Token& token : tokens) {
-        cout << token.value << " ";
-    }
-    cout << endl;
+    while (true) {
+        cout << "Choose an option: " << endl;
+        cout << "1. Run Lexer and Run Parser" << endl;
+        cout << "3. Exit" << endl;
+        cin >> choice;
 
-    Parser parser(tokens);
-    try {
-        shared_ptr<ASTNode> ast = parser.parse();
-        cout << "AST:" << endl;
-        printAST(ast);
-    } catch (const exception& e) {
-        cout << e.what() << endl;
+        if (choice == 3) break;
+
+        cout << "Enter the source file name: ";
+        cin >> filename;
+
+        string source = readFile(filename);
+
+        switch (choice) {
+            case 1:
+                runLexer(source);
+                runParser(source);
+                break;
+            default:
+                cout << "Invalid choice." << endl;
+                break;
+        }
     }
 
     return 0;

@@ -27,8 +27,7 @@ public:
         : type(type), value(value), left(nullptr), right(nullptr) {}
 
     // Constructor para inicializar un nodo con hijos.
-    ASTNode(ASTNodeType type, const string& value, 
-            shared_ptr<ASTNode> left, shared_ptr<ASTNode> right) 
+    ASTNode(ASTNodeType type, const string& value, shared_ptr<ASTNode> left, shared_ptr<ASTNode> right) 
         : type(type), value(value), left(left), right(right) {}
 };
 

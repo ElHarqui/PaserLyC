@@ -11,37 +11,48 @@ using namespace std;
 // La clase Parser es responsable de convertir una serie de tokens en un árbol de sintaxis abstracta (AST).
 class Parser {
 public:
-    // Constructor que inicializa el parser con una lista de tokens.
-    Parser(const vector<Token>& tokens);
+    // Constructor que inicializa el parser con los tokens.
+    Parser(const vector<Token>& tokens) : tokens(tokens), current(0) {}
 
-    // Función para parsear todos los tokens en un AST.
-    // Devuelve un puntero compartido al nodo raíz del AST.
+    // Función que inicia el proceso de parsing.
     shared_ptr<ASTNode> parse();
 
 private:
-    vector<Token> tokens; // La lista de tokens a parsear.
-    size_t current; // La posición actual en la lista de tokens.
+    vector<Token> tokens; // La serie de tokens.
+    size_t current; // La posición actual en la serie de tokens.
 
-    // Función para avanzar al siguiente token.
-    Token advance();
+    // Función que analiza una declaración.
+    shared_ptr<ASTNode> parseDeclaration();
 
-    // Función para obtener el token actual sin avanzar la posición.
-    Token peek() const;
-
-    // Función para verificar si el parser ha llegado al final de los tokens.
-    bool isAtEnd() const;
-
-    // Función para parsear una declaración.
-    shared_ptr<ASTNode> parseStatement();
-
-    // Función para parsear una expresión.
+    // Función que analiza una expresión.
     shared_ptr<ASTNode> parseExpression();
 
-    // Función para parsear un término (parte de una expresión).
-    shared_ptr<ASTNode> parseTerm();
+    // Función que analiza una expresión primaria.
+    shared_ptr<ASTNode> parsePrimary();
 
-    // Función para parsear un factor (parte de un término).
-    shared_ptr<ASTNode> parseFactor();
+    // Función que analiza una operación binaria.
+    shared_ptr<ASTNode> parseBinaryOp(int precedence, shared_ptr<ASTNode> left);
+
+    // Función que verifica si hemos llegado al final de los tokens.
+    bool isAtEnd() const;
+
+    // Función que obtiene el token actual.
+    Token advance();
+
+    // Función que obtiene el token actual sin avanzar.
+    Token peek() const;
+
+    // Función que obtiene el siguiente token sin avanzar.
+    Token peekNext() const;
+
+    // Función que consume un token esperado.
+    Token consume(TokenType type, const string& message);
+
+    // Función que verifica si el token actual es del tipo esperado.
+    bool check(TokenType type) const;
+
+    // Función que verifica si el token actual es del tipo esperado y avanza.
+    bool match(TokenType type);
 };
 
 #endif

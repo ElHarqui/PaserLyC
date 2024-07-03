@@ -5,25 +5,25 @@
 #include <vector>
 #include "Token.h"
 
+using namespace std;
+
 class Lexer {
 public:
-    Lexer(const std::string& source);
-    std::vector<Token> tokenize();
+    Lexer(const string& source);
+    vector<Token> tokenize();
 
 private:
-    std::string source;
-    size_t current;
+    string source;
+    size_t pos;
 
-    char advance();
     char peek() const;
+    char advance();
     bool isAtEnd() const;
-    void skipWhitespace();
-
-    Token lexToken();
-    Token lexIdentifier();
     Token lexNumber();
+    Token lexIdentifier();
     Token lexOperator();
+    void skipWhitespace();
 };
 
-#endif
+#endif // LEXER_H
 

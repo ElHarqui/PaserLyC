@@ -1,59 +1,69 @@
 #include "Lexer.h"
+#include <cctype>
 
-Lexer::Lexer(const string& source) : source(source), pos(0) {
-    keywords = {
-        {"if", TokenType::KEYWORD},
-        {"else", TokenType::KEYWORD},
-        {"while", TokenType::KEYWORD},
-        {"return", TokenType::KEYWORD}
-    };
-}
+Lexer::Lexer(const std::string& source) : source(source), current(0) {}
 
-vector<Token> Lexer::tokenize() {
-    vector<Token> tokens;
-    while (pos < source.length()) {
-        if (isspace(source[pos])) {
-            ++pos;
-            continue;
-        }
-
-        if (isalpha(source[pos])) {
-            tokens.push_back(lexIdentifier());
-        } else if (isdigit(source[pos])) {
-            tokens.push_back(lexNumber());
-        } else if (ispunct(source[pos])) {
-            tokens.push_back(lexOperator());
-        } else {
-            ++pos;  // Ignorar caracteres desconocidos
-        }
+std::vector<Token> Lexer::tokenize() {
+    std::vector<Token> tokens;
+    while (!isAtEnd()) {
+        skipWhitespace();
+        tokens.push_back(lexToken());
     }
-    tokens.push_back({TokenType::END, ""}); // Agregar token de fin
+    tokens.push_back(Token(TokenType::END_OF_FILE, ""));
     return tokens;
 }
 
+char Lexer::advance() {
+    return source[current++];
+}
+
+char Lexer::peek() const {
+    return source[current];
+}
+
+bool Lexer::isAtEnd() const {
+    return current >= source.length();
+}
+
+void Lexer::skipWhitespace() {
+    while (!isAtEnd() && std::isspace(peek())) {
+        advance();
+    }
+}
+
+Token Lexer::lexToken() {
+    if (std::isalpha(peek())) return lexIdentifier();
+    if (std::isdigit(peek())) return lexNumber();
+    if (std::ispunct(peek())) return lexOperator();
+    return Token(TokenType::UNKNOWN, std::string(1, advance()));
+}
+
 Token Lexer::lexIdentifier() {
-    size_t start = pos;
-    while (pos < source.length() && isalnum(source[pos])) {
-        ++pos;
+    std::string value;
+    while (!isAtEnd() && std::isalnum(peek())) {
+        value += advance();
     }
-    string value = source.substr(start, pos - start);
-    if (keywords.find(value) != keywords.end()) {
-        return {TokenType::KEYWORD, value};
+    if (value == "int" || value == "float") {
+        return Token(TokenType::KEYWORD, value);
     }
-    return {TokenType::IDENTIFIER, value};
+    return Token(TokenType::IDENTIFIER, value);
 }
 
 Token Lexer::lexNumber() {
-    size_t start = pos;
-    while (pos < source.length() && isdigit(source[pos])) {
-        ++pos;
+    std::string value;
+    while (!isAtEnd() && std::isdigit(peek())) {
+        value += advance();
     }
-    string value = source.substr(start, pos - start);
-    return {TokenType::NUMBER, value};
+    return Token(TokenType::NUMBER, value);
 }
 
 Token Lexer::lexOperator() {
-    string value(1, source[pos++]);
-    return {TokenType::OPERATOR, value};
+    char currentChar = advance();
+    switch (currentChar) {
+        case '+': case '-': case '*': case '/': case '=': case ';':
+            return Token(TokenType::OPERATOR, std::string(1, currentChar));
+        default:
+            return Token(TokenType::UNKNOWN, std::string(1, currentChar));
+    }
 }
 

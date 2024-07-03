@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Lexer.h"
 #include "Parser.h"
+#include "SymbolTable.h"
 
 using namespace std;
 
@@ -19,20 +20,17 @@ void performLexicalAnalysis(const string& source, vector<Token>& tokens) {
     }
 }
 
-void performSyntaxAnalysis(const vector<Token>& tokens) {
-    Parser parser(tokens);
-    auto ast = parser.parse();
+void performSyntaxAnalysis(const vector<Token>& tokens, SymbolTable& symTable) {
+    Parser parser(tokens, symTable);
+    parser.parse();
 
-    if (ast != nullptr) {
-        cout << "Syntax Analysis Complete" << endl;
-    } else {
-        cout << "Syntax Analysis Failed" << endl;
-    }
+    cout << "Syntax Analysis Complete" << endl;
 }
 
 int main() {
-    string source = "int a; float b; a = 1 + 2; b = a + 3.5;";
+    string source = "int main() { int x = 0; return x; }";
     vector<Token> tokens;
+    SymbolTable symTable;
 
     while (true) {
         cout << "Menu:" << endl;
@@ -56,15 +54,15 @@ int main() {
                 if (tokens.empty()) {
                     cout << "Please perform lexical analysis first." << endl;
                 } else {
-                    performSyntaxAnalysis(tokens);
+                    performSyntaxAnalysis(tokens, symTable);
                 }
                 break;
             case 4:
                 return 0;
             default:
-                cout << "Invalid option. Please try again." << endl;
+                cout << "Invalid option, please try again." << endl;
+                break;
         }
     }
-    return 0;
 }
 

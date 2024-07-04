@@ -1,59 +1,47 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <vector>
-#include <memory>
+#include "Lexer.h"
 #include "Token.h"
-#include "ASTNode.h"
-
+#include <memory>
+#include <string>
+#include <vector>
 using namespace std;
 
-// La clase Parser es responsable de convertir una serie de tokens en un árbol de sintaxis abstracta (AST).
+enum class ASTNodeType {
+    ASSIGNMENT,
+    EXPRESSION,
+    TERM,
+    FACTOR
+};
+
+class ASTNode {
+public:
+    ASTNodeType type;
+    string value;
+    vector<shared_ptr<ASTNode>> children;
+
+    ASTNode(ASTNodeType type, const string& value) : type(type), value(value) {}
+};
+
 class Parser {
 public:
-    // Constructor que inicializa el parser con los tokens.
-    Parser(const vector<Token>& tokens) : tokens(tokens), current(0) {}
-
-    // Función que inicia el proceso de parsing.
+    Parser(const vector<Token>& tokens);
     shared_ptr<ASTNode> parse();
 
 private:
-    vector<Token> tokens; // La serie de tokens.
-    size_t current; // La posición actual en la serie de tokens.
+    vector<Token> tokens;
+    size_t currentIndex;
 
-    // Función que analiza una declaración.
-    shared_ptr<ASTNode> parseDeclaration();
-
-    // Función que analiza una expresión.
-    shared_ptr<ASTNode> parseExpression();
-
-    // Función que analiza una expresión primaria.
-    shared_ptr<ASTNode> parsePrimary();
-
-    // Función que analiza una operación binaria.
-    shared_ptr<ASTNode> parseBinaryOp(int precedence, shared_ptr<ASTNode> left);
-
-    // Función que verifica si hemos llegado al final de los tokens.
-    bool isAtEnd() const;
-
-    // Función que obtiene el token actual.
     Token advance();
+    Token peek();
+    bool isAtEnd();
 
-    // Función que obtiene el token actual sin avanzar.
-    Token peek() const;
-
-    // Función que obtiene el siguiente token sin avanzar.
-    Token peekNext() const;
-
-    // Función que consume un token esperado.
-    Token consume(TokenType type, const string& message);
-
-    // Función que verifica si el token actual es del tipo esperado.
-    bool check(TokenType type) const;
-
-    // Función que verifica si el token actual es del tipo esperado y avanza.
-    bool match(TokenType type);
+    shared_ptr<ASTNode> parseStatement();
+    shared_ptr<ASTNode> parseExpression();
+    shared_ptr<ASTNode> parseTerm();
+    shared_ptr<ASTNode> parseFactor();
 };
 
-#endif
+#endif // PARSER_H
 

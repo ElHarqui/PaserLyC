@@ -1,83 +1,72 @@
 #include "Parser.h"
-#include <stdexcept>
 
-using namespace std;
+Parser::Parser(const vector<Token>& tokens) : tokens(tokens), currentIndex(0) {}
 
 shared_ptr<ASTNode> Parser::parse() {
-    return parseDeclaration();
-}
-
-shared_ptr<ASTNode> Parser::parseDeclaration() {
-    if (match(TokenType::KEYWORD)) {
-        string type = tokens[current - 1].value;
-        Token name = consume(TokenType::IDENTIFIER, "Expected variable name.");
-        consume(TokenType::DELIMITER, "Expected ';' after declaration.");
-        return make_shared<ASTNode>(ASTNodeType::VARIABLE, name.value);
-    }
-    return parseExpression();
-}
-
-shared_ptr<ASTNode> Parser::parseExpression() {
-    shared_ptr<ASTNode> left = parsePrimary();
-    return parseBinaryOp(0, left);
-}
-
-shared_ptr<ASTNode> Parser::parsePrimary() {
-    if (match(TokenType::NUMBER)) {
-        return make_shared<ASTNode>(ASTNodeType::NUMBER, tokens[current - 1].value);
-    }
-    if (match(TokenType::IDENTIFIER)) {
-        return make_shared<ASTNode>(ASTNodeType::VARIABLE, tokens[current - 1].value);
-    }
-    throw runtime_error("Error: Expected expression");
-}
-
-shared_ptr<ASTNode> Parser::parseBinaryOp(int precedence, shared_ptr<ASTNode> left) {
-    while (true) {
-        if (match(TokenType::OPERATOR)) {
-            string op = tokens[current - 1].value;
-            shared_ptr<ASTNode> right = parsePrimary();
-            left = make_shared<ASTNode>(ASTNodeType::BINARY_OP, op, left, right);
-        } else {
-            break;
-        }
-    }
-    return left;
-}
-
-bool Parser::isAtEnd() const {
-    return current >= tokens.size() || tokens[current].type == TokenType::END_OF_FILE;
+    return parseStatement();
 }
 
 Token Parser::advance() {
-    if (!isAtEnd()) current++;
-    return tokens[current - 1];
+    if (!isAtEnd()) currentIndex++;
+    return tokens[currentIndex];
 }
 
-Token Parser::peek() const {
-    return tokens[current];
+Token Parser::peek() {
+    if (isAtEnd()) return Token(TokenType::UNKNOWN, "");
+    return tokens[currentIndex];
 }
 
-Token Parser::peekNext() const {
-    if (isAtEnd()) return tokens[current];
-    return tokens[current + 1];
+bool Parser::isAtEnd() {
+    return currentIndex >= tokens.size();
 }
 
-Token Parser::consume(TokenType type, const string& message) {
-    if (check(type)) return advance();
-    throw runtime_error(message);
-}
-
-bool Parser::check(TokenType type) const {
-    if (isAtEnd()) return false;
-    return tokens[current].type == type;
-}
-
-bool Parser::match(TokenType type) {
-    if (check(type)) {
+shared_ptr<ASTNode> Parser::parseStatement() {
+    auto node = make_shared<ASTNode>(ASTNodeType::ASSIGNMENT, "");
+    node->children.push_back(parseExpression());
+    if (peek().type == TokenType::SEPARATOR) {
         advance();
-        return true;
+    } else {
+        throw runtime_error("Expected ';' after expression");
     }
-    return false;
+    return node;
+}
+
+shared_ptr<ASTNode> Parser::parseExpression() {
+    auto node = make_shared<ASTNode>(ASTNodeType::EXPRESSION, "");
+    node->children.push_back(parseTerm());
+    while (peek().type == TokenType::OPERATOR && (peek().value == "+" || peek().value == "-")) {
+        auto opNode = make_shared<ASTNode>(ASTNodeType::EXPRESSION, advance().value);
+        opNode->children.push_back(node);
+        opNode->children.push_back(parseTerm());
+        node = opNode;
+    }
+    return node;
+}
+
+shared_ptr<ASTNode> Parser::parseTerm() {
+    auto node = make_shared<ASTNode>(ASTNodeType::TERM, "");
+    node->children.push_back(parseFactor());
+    while (peek().type == TokenType::OPERATOR && (peek().value == "*" || peek().value == "/")) {
+        auto opNode = make_shared<ASTNode>(ASTNodeType::TERM, advance().value);
+        opNode->children.push_back(node);
+        opNode->children.push_back(parseFactor());
+        node = opNode;
+    }
+    return node;
+}
+
+shared_ptr<ASTNode> Parser::parseFactor() {
+    auto token = advance();
+    if (token.type == TokenType::IDENTIFIER || token.type == TokenType::NUMBER) {
+        return make_shared<ASTNode>(ASTNodeType::FACTOR, token.value);
+    } else if (token.value == "(") {
+        auto node = parseExpression();
+        if (advance().value != ")") {
+            throw runtime_error("Expected ')'");
+        }
+        return node;
+    } else {
+        throw runtime_error("Unexpected token: " + token.value);
+    }
 }
 

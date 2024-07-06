@@ -8,7 +8,7 @@ using namespace std;
 
 string readFile(const string &filename) {
     ifstream file(filename);
-    if (!file.is_open()) throw runtime_error("Unable to open file");
+    if (!file.is_open()) throw runtime_error("Archivo no se puede abrir");
     stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
@@ -18,7 +18,7 @@ void runLexer(const string &source) {
     Lexer lexer(source);
     auto tokens = lexer.tokenize();
     for (const auto &token : tokens) {
-        cout << "Token Type: " << static_cast<int>(token.type) << ", Value: " << token.value << endl;
+        cout << "Tipo de Token: " << static_cast<int>(token.type) << ", Valor: " << token.value << endl;
     }
 }
 
@@ -28,7 +28,7 @@ void runParser(const string &source) {
     Parser parser(tokens);
     try {
         auto ast = parser.parse();
-        cout << "Parsing successful!" << endl;
+        cout << "Parseo satisfactorio!" << endl;
     } catch (const exception &e) {
         cout << "Error: " << e.what() << endl;
     }
@@ -36,9 +36,9 @@ void runParser(const string &source) {
 
 int main() {
     while (true) {
-        cout << "Choose an option:" << endl;
-        cout << "1. Run Lexer" << endl;
-        cout << "2. Run Parser" << endl;
+        cout << "Elije una opcion:" << endl;
+        cout << "1. Correr Analisis Lexico" << endl;
+        cout << "2. Correr Parser" << endl;
         cout << "3. Exit" << endl;
 
         int choice;
@@ -46,7 +46,7 @@ int main() {
 
         if (choice == 3) break;
 
-        cout << "Enter the source file name: ";
+        cout << "Nombre de archivo : ";
         string filename;
         cin >> filename;
 

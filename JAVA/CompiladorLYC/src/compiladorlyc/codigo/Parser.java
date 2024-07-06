@@ -9,12 +9,12 @@ public class Parser {
     private final List<Token> tokens;
     private int current;
 
-    Parser(List<Token> tokens) {
+    public Parser(List<Token> tokens) {
         this.tokens = tokens;
         this.current = 0;
     }
 
-    ASTNode parse() {
+    public ASTNode parse() {
         return statement();
     }
 

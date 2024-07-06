@@ -4,16 +4,16 @@ package compiladorlyc.codigo;
 import java.util.ArrayList;
 import java.util.List;
 
-class Lexer {
+public class Lexer {
     private final String source;
     private int current;
 
-    Lexer(String source) {
+    public Lexer(String source) {
         this.source = source;
         this.current = 0;
     }
 
-    List<Token> tokenize() {
+    public List<Token> tokenize() {
         List<Token> tokens = new ArrayList<>();
         while (!isAtEnd()) {
             skipWhitespace();

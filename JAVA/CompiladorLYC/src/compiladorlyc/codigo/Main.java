@@ -28,7 +28,7 @@ public class Main {
 
                 String source;
                 try {
-                    source = readFile(filename);
+                    source = readFile(".\\src\\Data"+filename);
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                     continue;

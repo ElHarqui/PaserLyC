@@ -1,4 +1,3 @@
-
 package compiladorlyc.codigo;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ public class Lexer {
         List<Token> tokens = new ArrayList<>();
         while (!isAtEnd()) {
             skipWhitespace();
+            if (isAtEnd()) break; // Asegurarse de no avanzar más si se alcanza el final
             char c = advance();
             if (Character.isDigit(c)) {
                 tokens.add(lexNumber());
@@ -39,7 +39,10 @@ public class Lexer {
     }
 
     private char advance() {
-        return source.charAt(current++);
+        if (!isAtEnd()) {
+            return source.charAt(current++);
+        }
+        return '\0'; // Retorna un carácter nulo si ya está al final para evitar excepciones
     }
 
     private char peek() {
@@ -88,4 +91,3 @@ public class Lexer {
         }
     }
 }
-

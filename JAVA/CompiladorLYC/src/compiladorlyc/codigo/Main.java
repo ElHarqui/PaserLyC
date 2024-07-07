@@ -28,11 +28,12 @@ public class Main {
 
                 String source;
                 try {
-                    source = readFile(".\\src\\Data\\"+filename);
+                    source = readFile(".\\src\\Data"+filename);
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                     continue;
                 }
+
                 if (choice == 1) {
                     runLexer(source);
                 } else if (choice == 2) {

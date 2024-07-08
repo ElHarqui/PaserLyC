@@ -12,7 +12,12 @@ public class Parser {
     }
 
     public ASTNode parse() {
-        return statement();
+        try {
+            return statement();
+        } catch (ParseError e) {
+            System.err.println(e.getMessage());
+            return null; // En caso de error, retorna null
+        }
     }
 
     private boolean isAtEnd() {
@@ -31,12 +36,12 @@ public class Parser {
 
     private Token expect(TokenType type, String message) {
         if (peek().type == type) return advance();
-        throw new RuntimeException(message);
+        throw new ParseError(message);
     }
 
     private ASTNode statement() {
         ASTNode expr = expression();
-        expect(TokenType.SEMICOLON, "Expected ';' after expression");
+        expect(TokenType.SEMICOLON, "Error: 1Expected ';' after expression");
         return expr;
     }
 
@@ -60,7 +65,7 @@ public class Parser {
             newNode.left = node;
             newNode.right = factor();
             if (token.value.equals("/") && newNode.right.value.equals("0")) {
-                throw new RuntimeException("Division by zero detected");
+                throw new ParseError("Error: Division by zero detected");
             }
             node = newNode;
         }
@@ -73,9 +78,9 @@ public class Parser {
         } else if (peek().type == TokenType.OPERATOR && peek().value.equals("(")) {
             advance();
             ASTNode node = expression();
-            expect(TokenType.OPERATOR, "Expected ')' after expression");
+            expect(TokenType.OPERATOR, "Error: Expected ')' after expression");
             return node;
         }
-        throw new RuntimeException("Expected expression");
+        throw new ParseError("Error: Expected expression");
     }
 }

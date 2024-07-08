@@ -87,6 +87,7 @@ public class NewJFrame extends javax.swing.JFrame {
             //        
             Lexer lexer = new Lexer(source);
             List<Token> tokens = lexer.tokenize();
+            System.out.println("TOKENS CORRECTO");
             Parser parser = new Parser(tokens);
             try {
                 ASTNode ast = parser.parse();

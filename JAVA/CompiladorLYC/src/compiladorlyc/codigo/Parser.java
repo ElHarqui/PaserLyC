@@ -1,9 +1,6 @@
-
 package compiladorlyc.codigo;
 
-
 import java.util.List;
-
 
 public class Parser {
     private final List<Token> tokens;
@@ -62,6 +59,9 @@ public class Parser {
             ASTNode newNode = new ASTNode(token.type, token.value);
             newNode.left = node;
             newNode.right = factor();
+            if (token.value.equals("/") && newNode.right.value.equals("0")) {
+                throw new RuntimeException("Division by zero detected");
+            }
             node = newNode;
         }
         return node;
@@ -79,4 +79,3 @@ public class Parser {
         throw new RuntimeException("Expected expression");
     }
 }
-

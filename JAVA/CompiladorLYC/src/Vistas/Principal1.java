@@ -1,32 +1,28 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package Vistas;
 
 import compiladorlyc.codigo.ASTNode;
 import compiladorlyc.codigo.Lexer;
 import compiladorlyc.codigo.Parser;
 import compiladorlyc.codigo.Token;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 /**
  *
  * @author HarquiDEF
  */
-public class NewJFrame extends javax.swing.JFrame {
+public class Principal1 extends javax.swing.JFrame {
 
     /**
      * Creates new form NewJFrame
      */
-    public NewJFrame() {
+    public Principal1() {
         initComponents();
     }
 
@@ -125,22 +121,24 @@ public class NewJFrame extends javax.swing.JFrame {
             String ParserMessage;
             try {
                 ASTNode ast = parser.parse();
-                ParserMessage = "Parsing successful!";
+                if (ast != null) {
+                    ParserMessage = "Parsing successful!";
+                } else {
+                    ParserMessage = "Parsing failed!";
+                }
                 System.out.println(ParserMessage);
                 ParserText.setText(ParserMessage);
-                
+
             } catch (RuntimeException e) {
-               System.out.println("Error: " + e.getMessage());
-               System.out.println("ERROR SEGUNDO TRY");
-               ParserText.setText("ERROR en el parseo");
+                System.out.println("Error: " + e.getMessage());
+                ParserMessage = "ERROR en el parseo: " + e.getMessage();
+                System.out.println(ParserMessage);
+                ParserText.setText(ParserMessage);
             }
             
 
-            
-            
-           
         } catch (IOException ex) {
-            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Principal1.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("ERROR PRIMER TRY");
         }
         
@@ -168,20 +166,21 @@ public class NewJFrame extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Principal1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Principal1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Principal1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Principal1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new NewJFrame().setVisible(true);
+                new Principal1().setVisible(true);
             }
         });
     }

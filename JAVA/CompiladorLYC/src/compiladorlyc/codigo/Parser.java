@@ -16,7 +16,7 @@ public class Parser {
             return statement();
         } catch (ParseError e) {
             System.err.println(e.getMessage());
-            return null; // En caso de error, retorna null
+            return null;
         }
     }
 
@@ -41,7 +41,7 @@ public class Parser {
 
     private ASTNode statement() {
         ASTNode expr = expression();
-        expect(TokenType.SEMICOLON, "Error: 1Expected ';' after expression");
+        expect(TokenType.SEMICOLON, "Error: Expected ';' after expression");
         return expr;
     }
 

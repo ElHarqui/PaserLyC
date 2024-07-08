@@ -41,6 +41,9 @@ public class NewJFrame extends javax.swing.JFrame {
 
         jButton1 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
+        Titulo = new javax.swing.JLabel();
+        TokenText = new javax.swing.JLabel();
+        ParserText = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -51,25 +54,50 @@ public class NewJFrame extends javax.swing.JFrame {
             }
         });
 
+        Titulo.setFont(new java.awt.Font("Showcard Gothic", 0, 36)); // NOI18N
+        Titulo.setForeground(new java.awt.Color(0, 153, 153));
+        Titulo.setText("PARSER");
+
+        TokenText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        TokenText.setToolTipText("");
+
+        ParserText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(156, 156, 156)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(ParserText, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(131, 131, 131)
+                            .addComponent(Titulo))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(163, 163, 163)
+                            .addComponent(jButton1))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(69, 69, 69)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                                .addComponent(TokenText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap(70, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(100, Short.MAX_VALUE)
+                .addContainerGap(53, Short.MAX_VALUE)
+                .addComponent(Titulo)
+                .addGap(18, 18, 18)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(95, 95, 95)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
-                .addGap(60, 60, 60))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(TokenText, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ParserText, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(72, 72, 72))
         );
 
         pack();
@@ -90,14 +118,21 @@ public class NewJFrame extends javax.swing.JFrame {
             for (Token token : tokens) {
               System.out.println("Token Type: " + token.type + ", Value: " + token.value);
             }
-            System.out.println("TOKENS CORRECTO");
+            String TokenMessage = "TOKENS CORRECTO";
+            System.out.println(TokenMessage);
+            TokenText.setText(TokenMessage);
             Parser parser = new Parser(tokens);
+            String ParserMessage;
             try {
                 ASTNode ast = parser.parse();
-                System.out.println("Parsing successful!");
+                ParserMessage = "Parsing successful!";
+                System.out.println(ParserMessage);
+                ParserText.setText(ParserMessage);
+                
             } catch (RuntimeException e) {
                System.out.println("Error: " + e.getMessage());
-                System.out.println("ERROR SEGUNDO TRY");
+               System.out.println("ERROR SEGUNDO TRY");
+               ParserText.setText("ERROR en el parseo");
             }
             
 
@@ -152,6 +187,9 @@ public class NewJFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel ParserText;
+    private javax.swing.JLabel Titulo;
+    private javax.swing.JLabel TokenText;
     private javax.swing.JButton jButton1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables

@@ -20,6 +20,7 @@ public class Interpreter {
         if (node == null) {
             return null;
         }
+        System.out.println("Evaluando nodo: " + node.type + " con valor: " + node.value);
 
         switch (node.type) {
             case INTEGER:
@@ -35,7 +36,7 @@ public class Interpreter {
                     throw new IllegalArgumentException("Variable no declarada: " + node.value);
                 }
             case DATA_TYPE:
-                if (node.left.type == TokenType.IDENTIFIER && node.right != null) {
+                if (node.left != null && node.left.type == TokenType.IDENTIFIER && node.right != null) {
                     variableValues.put(node.left.value, evaluate(node.right));
                     return null;
                 } else {

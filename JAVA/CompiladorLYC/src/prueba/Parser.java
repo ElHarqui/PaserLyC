@@ -15,10 +15,6 @@ public class Parser {
         this.current = 0;
     }
 
-    public int getCurrent() {
-        return current;
-    }
-
     public ASTNode parse() {
         try {
             return statement();
@@ -39,17 +35,6 @@ public class Parser {
         return tokens.get(current - 1);
     }
 
-    private void declareVariable(Token token) {
-        if (symbolTable.containsKey(token.valor)) {
-            throw new ParseError("Error: Variable '" + token.valor + "' ya declarada");
-        }
-        symbolTable.put(token.valor, token.tipo);
-    }
-
-    private boolean isVariableDeclared(Token token) {
-        return symbolTable.containsKey(token.valor);
-    }
-
     private Token peek() {
         if (isAtEnd()) {
             return tokens.get(tokens.size() - 1);
@@ -67,16 +52,11 @@ public class Parser {
     private ASTNode factor() {
         if (!isAtEnd() && (peek().tipo == TokenType.INTEGER || peek().tipo == TokenType.FLOAT || peek().tipo == TokenType.IDENTIFIER || peek().tipo == TokenType.STRING)) {
             Token token = advance();
-            if (token.tipo == TokenType.IDENTIFIER) {
-                if (!isVariableDeclared(token)) {
-                    throw new ParseError("Error: Variable '" + token.valor + "' no declarada");
-                }
-            }
             return new ASTNode(token.tipo, token.valor);
-        } else if (!isAtEnd() && peek().tipo == TokenType.OPERATOR && peek().valor.equals("(")) {
-            advance();
+        } else if (!isAtEnd() && peek().tipo == TokenType.DELIMITER && peek().valor.equals("(")) {
+            advance(); // Consume '('
             ASTNode node = expression();
-            expect(TokenType.OPERATOR, "Error: Se esperaba ')'");
+            expect(TokenType.DELIMITER, "Se esperaba ')'");
             return node;
         } else {
             throw new ParseError("Error: Se esperaba un factor válido");
@@ -111,41 +91,38 @@ public class Parser {
     }
 
     private ASTNode statement() {
-        if (peek().tipo == TokenType.OUTPUT && peek().valor.equals("cout")) {
+        if (peek().tipo == TokenType.KEYWORD) {
+            return declaration();
+        } else if (peek().tipo == TokenType.OUTPUT) {
             return handleCoutStatement();
-        } else if (peek().tipo == TokenType.KEYWORD) {
-            return handleVariableDeclaration();
         } else {
-            ASTNode expr = expression();
-            if (!isAtEnd() && peek().tipo == TokenType.SEMICOLON) {
-                advance();
-            } else {
-                throw new ParseError("Error: Punto y coma esperado después de la instrucción");
-            }
-            return expr;
+            return expressionStatement();
         }
+    }
+
+    private ASTNode declaration() {
+        Token keyword = expect(TokenType.KEYWORD, "Error: Se esperaba una palabra clave de tipo de dato");
+        Token identifier = expect(TokenType.IDENTIFIER, "Error: Se esperaba un identificador después del tipo de dato");
+        expect(TokenType.OPERATOR, "Error: Se esperaba '=' después del identificador");
+        ASTNode value = expression();
+        expect(TokenType.SEMICOLON, "Error: Se esperaba ';' después de la declaración de la variable");
+        return new ASTNode(TokenType.DATA_TYPE, keyword.valor, new ASTNode(TokenType.IDENTIFIER, identifier.valor), value);
+    }
+
+    private ASTNode expressionStatement() {
+        ASTNode expr = expression();
+        expect(TokenType.SEMICOLON, "Error: Se esperaba ';' después de la expresión");
+        return expr;
     }
 
     private ASTNode handleCoutStatement() {
         expect(TokenType.OUTPUT, "Error: Se esperaba 'cout'");
         expect(TokenType.SHIFT_LEFT, "Error: Se esperaba '<<'");
         ASTNode expr = expression();
-        expect(TokenType.SEMICOLON, "Error: Se esperaba ';'");
+        expect(TokenType.SEMICOLON, "Error: Se esperaba ';' después de 'cout <<'");
         return new ASTNode(TokenType.OUTPUT, "cout <<", expr);
-    }
-
-    private ASTNode handleVariableDeclaration() {
-        Token typeToken = advance(); // int, float, etc.
-        Token identifierToken = expect(TokenType.IDENTIFIER, "Error: Se esperaba un identificador de variable");
-        expect(TokenType.OPERATOR, "Error: Se esperaba '='");
-        ASTNode valueNode = expression();
-        expect(TokenType.SEMICOLON, "Error: Se esperaba ';'");
-
-        declareVariable(identifierToken);
-
-        return new ASTNode(TokenType.DATA_TYPE, identifierToken.valor, valueNode);
     }
     public int getcurrent(){
         return current;
-    }    
+    }
 }

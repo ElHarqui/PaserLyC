@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String codigoFuente = "int x = 42; cout << x;";
+        String codigoFuente = "int x = 42; x = x+1; cout << x;";
         Lexer lexer = new Lexer(codigoFuente);
         List<Token> tokens = lexer.tokenize();
         Parser parser = new Parser(tokens);

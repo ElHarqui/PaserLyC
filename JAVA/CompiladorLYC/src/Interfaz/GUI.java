@@ -38,6 +38,8 @@ public class GUI extends javax.swing.JFrame {
         textAreaEntrada = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         textAreaSalida = new javax.swing.JTextArea();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        CoutSalida = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -83,7 +85,7 @@ public class GUI extends javax.swing.JFrame {
         jScrollPane1.setViewportView(textAreaEntrada);
 
         jPanel1.add(jScrollPane1);
-        jScrollPane1.setBounds(40, 70, 270, 330);
+        jScrollPane1.setBounds(40, 70, 270, 160);
 
         textAreaSalida.setEditable(false);
         textAreaSalida.setColumns(20);
@@ -94,6 +96,13 @@ public class GUI extends javax.swing.JFrame {
 
         jPanel1.add(jScrollPane2);
         jScrollPane2.setBounds(333, 72, 280, 330);
+
+        CoutSalida.setColumns(20);
+        CoutSalida.setRows(5);
+        jScrollPane4.setViewportView(CoutSalida);
+
+        jPanel1.add(jScrollPane4);
+        jScrollPane4.setBounds(60, 250, 234, 86);
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 500));
 
@@ -131,6 +140,14 @@ public class GUI extends javax.swing.JFrame {
             ASTNode root = parser.parse();
             Interpreter interpreter = new Interpreter(root);
             interpreter.interpret();
+           
+            StringBuilder coutOutput = new StringBuilder();
+            List<String> Resultados = interpreter.getResultados();
+            for (String resul : Resultados) {
+                coutOutput.append(resul).append("\n");
+            }
+            
+            CoutSalida.append(coutOutput.toString());
         } 
 
     }//GEN-LAST:event_EjecutarActionPerformed
@@ -180,6 +197,7 @@ public class GUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea CoutSalida;
     private javax.swing.JButton Ejecutar;
     private javax.swing.JButton Limpiar;
     private javax.swing.JButton Salir;
@@ -187,6 +205,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea textAreaEntrada;
     private javax.swing.JTextArea textAreaSalida;
     // End of variables declaration//GEN-END:variables

@@ -1,15 +1,22 @@
 package prueba;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Interpreter {
     private ASTNode root;
     private Map<String, Object> variableValues;
+    private List<String> Resultados;
 
     public Interpreter(ASTNode root) {
         this.root = root;
         this.variableValues = new HashMap<>();
+        this.Resultados = new ArrayList<>();
+    }
+    public List<String> getResultados(){
+        return this.Resultados;
     }
 
     public void interpret() {
@@ -37,6 +44,7 @@ public class Interpreter {
                     throw new IllegalArgumentException("Variable no declarada: " + node.value);
                 }
             case DATA_TYPE:
+                if (node.left.type == TokenType.IDENTIFIER && node.right != null) {
                     variableValues.put(node.left.value, evaluate(node.right));
                     return null;
                 } else {
@@ -64,7 +72,8 @@ public class Interpreter {
                 }
             case OUTPUT:
                 if ("cout <<".equals(node.value)) {
-                    System.out.println(evaluate(node.left));
+                    //System.out.println(evaluate(node.left));
+                    this.Resultados.add( String.valueOf(evaluate(node.left)));
                     return null;
                 }
                 return node.value;

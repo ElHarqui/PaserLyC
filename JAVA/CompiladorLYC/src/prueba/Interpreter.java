@@ -72,7 +72,6 @@ public class Interpreter {
                 }
             case OUTPUT:
                 if ("cout <<".equals(node.value)) {
-                    //System.out.println(evaluate(node.left));
                     this.Resultados.add( String.valueOf(evaluate(node.left)));
                     return null;
                 }

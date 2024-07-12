@@ -141,14 +141,14 @@ public class Lexer {
             value.append(advance());
         }
         if (!isAtEnd()) {
-            advance(); // Consume la comilla final
+            advance(); 
         }
         return new Token(TokenType.STRING, value.toString());
     }
 
     private Token lexPreprocessorDirective() {
         StringBuilder value = new StringBuilder();
-        value.append(source.charAt(current - 1)); // Añade el `#`
+        value.append(source.charAt(current - 1)); 
         while (!isAtEnd() && peek() != '\n') {
             value.append(advance());
         }

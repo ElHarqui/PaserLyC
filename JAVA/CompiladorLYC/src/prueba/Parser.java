@@ -15,10 +15,10 @@ public class Parser {
         this.current = 0;
     }
 
-    public int getcurrent(){
+    public int getCurrent() {
         return current;
     }
-    
+
     public ASTNode parse() {
         try {
             return statement();
@@ -65,7 +65,7 @@ public class Parser {
     }
 
     private ASTNode factor() {
-        if (!isAtEnd() && (peek().tipo == TokenType.INTEGER || peek().tipo == TokenType.FLOAT || peek().tipo == TokenType.IDENTIFIER || peek().tipo == TokenType.DATA_TYPE)) {
+        if (!isAtEnd() && (peek().tipo == TokenType.INTEGER || peek().tipo == TokenType.FLOAT || peek().tipo == TokenType.IDENTIFIER || peek().tipo == TokenType.STRING)) {
             Token token = advance();
             if (token.tipo == TokenType.IDENTIFIER) {
                 if (!isVariableDeclared(token)) {
@@ -76,7 +76,7 @@ public class Parser {
         } else if (!isAtEnd() && peek().tipo == TokenType.OPERATOR && peek().valor.equals("(")) {
             advance();
             ASTNode node = expression();
-            expect(TokenType.OPERATOR, ")");
+            expect(TokenType.OPERATOR, "Error: Se esperaba ')'");
             return node;
         } else {
             throw new ParseError("Error: Se esperaba un factor válido");
@@ -111,20 +111,41 @@ public class Parser {
     }
 
     private ASTNode statement() {
-        ASTNode expr = expression();
-        if (!isAtEnd() && peek().tipo == TokenType.SEMICOLON) {
-            advance();
+        if (peek().tipo == TokenType.OUTPUT && peek().valor.equals("cout")) {
+            return handleCoutStatement();
+        } else if (peek().tipo == TokenType.KEYWORD) {
+            return handleVariableDeclaration();
         } else {
-            throw new ParseError("Error: Punto y coma esperado después de la instrucción");
+            ASTNode expr = expression();
+            if (!isAtEnd() && peek().tipo == TokenType.SEMICOLON) {
+                advance();
+            } else {
+                throw new ParseError("Error: Punto y coma esperado después de la instrucción");
+            }
+            return expr;
         }
-        return expr;
     }
 
-    // Agregar una función para manejar 'cout <<' 
     private ASTNode handleCoutStatement() {
         expect(TokenType.OUTPUT, "Error: Se esperaba 'cout'");
         expect(TokenType.SHIFT_LEFT, "Error: Se esperaba '<<'");
         ASTNode expr = expression();
+        expect(TokenType.SEMICOLON, "Error: Se esperaba ';'");
         return new ASTNode(TokenType.OUTPUT, "cout <<", expr);
     }
+
+    private ASTNode handleVariableDeclaration() {
+        Token typeToken = advance(); // int, float, etc.
+        Token identifierToken = expect(TokenType.IDENTIFIER, "Error: Se esperaba un identificador de variable");
+        expect(TokenType.OPERATOR, "Error: Se esperaba '='");
+        ASTNode valueNode = expression();
+        expect(TokenType.SEMICOLON, "Error: Se esperaba ';'");
+
+        declareVariable(identifierToken);
+
+        return new ASTNode(TokenType.DATA_TYPE, identifierToken.valor, valueNode);
+    }
+    public int getcurrent(){
+        return current;
+    }    
 }

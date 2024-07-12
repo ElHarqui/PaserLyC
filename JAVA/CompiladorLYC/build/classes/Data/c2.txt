@@ -1,4 +1,4 @@
-int a = 5
-float b = 10.5;
+int a = 1;
+float b =5;
 c = a + b;
 d = a * (b + 2);

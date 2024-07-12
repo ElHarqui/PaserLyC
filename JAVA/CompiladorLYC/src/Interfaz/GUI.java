@@ -3,6 +3,7 @@ package Interfaz;
 
 import java.util.List;
 import prueba.ASTNode;
+import prueba.Interpreter;
 import prueba.Lexer;
 import prueba.ParseError;
 import prueba.Parser;
@@ -127,6 +128,9 @@ public class GUI extends javax.swing.JFrame {
 
             String tokenMessage = "TOKENS CORRECTO\n";
             System.out.println(tokenMessage); // Imprime en consola
+            ASTNode root = parser.parse();
+            Interpreter interpreter = new Interpreter(root);
+            interpreter.interpret();
         } 
 
     }//GEN-LAST:event_EjecutarActionPerformed

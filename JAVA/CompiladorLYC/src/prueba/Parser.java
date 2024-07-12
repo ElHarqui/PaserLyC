@@ -1,4 +1,3 @@
-
 package prueba;
 
 import java.util.HashMap;
@@ -15,9 +14,11 @@ public class Parser {
         this.tokens = tokens;
         this.current = 0;
     }
-public int getcurrent(){
-    return current;
-}
+
+    public int getcurrent(){
+        return current;
+    }
+    
     public ASTNode parse() {
         try {
             return statement();
@@ -62,25 +63,25 @@ public int getcurrent(){
         }
         throw new ParseError(message);
     }
-private ASTNode factor() {
-    if (!isAtEnd() && (peek().tipo == TokenType.INTEGER || peek().tipo == TokenType.FLOAT || peek().tipo == TokenType.IDENTIFIER || peek().tipo == TokenType.DATA_TYPE)) {
-        Token token = advance();
-        if (token.tipo == TokenType.IDENTIFIER) {
-            if (!isVariableDeclared(token)) {
-                throw new ParseError("Error: Variable '" + token.valor + "' no declarada");
-            }
-        }
-        return new ASTNode(token.tipo, token.valor);
-    } else if (!isAtEnd() && peek().tipo == TokenType.OPERATOR && peek().valor.equals("(")) {
-        advance();
-        ASTNode node = expression();
-        expect(TokenType.OPERATOR, ")");
-        return node;
-    } else {
-        throw new ParseError("Error: Se esperaba un factor válido");
-    }
-}
 
+    private ASTNode factor() {
+        if (!isAtEnd() && (peek().tipo == TokenType.INTEGER || peek().tipo == TokenType.FLOAT || peek().tipo == TokenType.IDENTIFIER || peek().tipo == TokenType.DATA_TYPE)) {
+            Token token = advance();
+            if (token.tipo == TokenType.IDENTIFIER) {
+                if (!isVariableDeclared(token)) {
+                    throw new ParseError("Error: Variable '" + token.valor + "' no declarada");
+                }
+            }
+            return new ASTNode(token.tipo, token.valor);
+        } else if (!isAtEnd() && peek().tipo == TokenType.OPERATOR && peek().valor.equals("(")) {
+            advance();
+            ASTNode node = expression();
+            expect(TokenType.OPERATOR, ")");
+            return node;
+        } else {
+            throw new ParseError("Error: Se esperaba un factor válido");
+        }
+    }
 
     private ASTNode expression() {
         ASTNode node = term();
@@ -110,28 +111,20 @@ private ASTNode factor() {
     }
 
     private ASTNode statement() {
-        if (peek().tipo == TokenType.OUTPUT) {
-            return printStatement();
+        ASTNode expr = expression();
+        if (!isAtEnd() && peek().tipo == TokenType.SEMICOLON) {
+            advance();
         } else {
-            ASTNode expr = expression();
-            if (!isAtEnd() && peek().tipo == TokenType.SEMICOLON) {
-                advance();
-            } else {
-                throw new ParseError("Error: Punto y coma esperado después de la instrucción");
-            }
-            return expr;
+            throw new ParseError("Error: Punto y coma esperado después de la instrucción");
         }
+        return expr;
     }
-    private ASTNode printStatement() {
-        expect(TokenType.OUTPUT, "Se esperaba 'cout'");
-        expect(TokenType.OPERATOR, "<<");
-        Token identifier = expect(TokenType.IDENTIFIER, "Se esperaba un identificador después de '<<'");
-        if (!isVariableDeclared(identifier)) {
-            throw new ParseError("Error: Variable '" + identifier.valor + "' no declarada");
-        }
-        expect(TokenType.SEMICOLON, "Se esperaba ';' después de la instrucción");
-        return new ASTNode(TokenType.OUTPUT, identifier.valor);
-    }
-    
-}
 
+    // Agregar una función para manejar 'cout <<' 
+    private ASTNode handleCoutStatement() {
+        expect(TokenType.OUTPUT, "Error: Se esperaba 'cout'");
+        expect(TokenType.SHIFT_LEFT, "Error: Se esperaba '<<'");
+        ASTNode expr = expression();
+        return new ASTNode(TokenType.OUTPUT, "cout <<", expr);
+    }
+}

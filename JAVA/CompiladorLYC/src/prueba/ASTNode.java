@@ -13,5 +13,17 @@ public class ASTNode {
         this.right = null;
     }
 
-}
+    public ASTNode(TokenType type, String value, ASTNode left, ASTNode right) {
+        this.type = type;
+        this.value = value;
+        this.left = left;
+        this.right = right;
+    }
 
+    public ASTNode(TokenType type, String value, ASTNode left) {
+        this.type = type;
+        this.value = value;
+        this.left = left;
+        this.right = null;
+    }
+}

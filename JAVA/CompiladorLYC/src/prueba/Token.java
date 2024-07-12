@@ -38,10 +38,6 @@ public class Token {
                 return "Numero : " + valor;
             case DOUBLE_QUOTE:
                 return "Comillas dobles (\")";
-            case SINGLE_QUOTE:
-                return " (')";
-            case CASE_SYMBOL:
-                return "(' ')";
             case INCREMENT:
                 return " Incremento ++";
             case SHIFT_LEFT:

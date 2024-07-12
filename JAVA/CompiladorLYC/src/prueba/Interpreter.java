@@ -1,42 +1,68 @@
 package prueba;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Interpreter {
+    private ASTNode root;
+    private Map<String, Object> variableValues;
 
-    private Map<String, String> symbolTable;
-
-    public Interpreter(Map<String, String> symbolTable) {
-        this.symbolTable = symbolTable;
+    public Interpreter(ASTNode root) {
+        this.root = root;
+        this.variableValues = new HashMap<>();
     }
 
-    public void interpret(ASTNode node) {
+    public void interpret() {
+        evaluate(root);
+    }
+
+    private Object evaluate(ASTNode node) {
         if (node == null) {
-            return;
+            return null;
         }
-        switch (node.type) {
-            case OUTPUT:
-                printVariable(node.value);
-                break;
-            case OPERATOR:
-                // Interpretar operadores (por ejemplo, +, -, *, /)
-                interpret(node.left);
-                interpret(node.right);
-                break;
-            case IDENTIFIER:
-            case INTEGER:
-            case FLOAT:
-                // Manejar identificadores y literales
-                break;
-            default:
-                throw new RuntimeException("Tipo de nodo no soportado: " + node.type);
-        }
-    }
 
-    private void printVariable(String variableName) {
-        if (!symbolTable.containsKey(variableName)) {
-            throw new RuntimeException("Variable '" + variableName + "' no declarada");
+        switch (node.type) {
+            case INTEGER:
+                return Integer.parseInt(node.value);
+            case FLOAT:
+                return Double.parseDouble(node.value);
+            case STRING:
+                return node.value;
+            case IDENTIFIER:
+                if (variableValues.containsKey(node.value)) {
+                    return variableValues.get(node.value);
+                } else {
+                    throw new IllegalArgumentException("Variable no declarada: " + node.value);
+                }
+            case DATA_TYPE:
+                if (node.left.type == TokenType.IDENTIFIER && node.right != null) {
+                    variableValues.put(node.left.value, evaluate(node.right));
+                    return null;
+                } else {
+                    throw new IllegalArgumentException("Declaración de variable incorrecta");
+                }
+            case OPERATOR:
+                switch (node.value) {
+                    case "+":
+                        return (int) evaluate(node.left) + (int) evaluate(node.right);
+                    case "-":
+                        return (int) evaluate(node.left) - (int) evaluate(node.right);
+                    case "*":
+                        return (int) evaluate(node.left) * (int) evaluate(node.right);
+                    case "/":
+                        return (int) evaluate(node.left) / (int) evaluate(node.right);
+                    default:
+                        throw new IllegalArgumentException("Operador desconocido: " + node.value);
+                }
+            case OUTPUT:
+                if ("cout <<".equals(node.value)) {
+                    System.out.println(evaluate(node.left));
+                    return null;
+                }
+                // Otros casos de OUTPUT
+                return node.value;
+            default:
+                throw new IllegalArgumentException("Tipo de nodo desconocido: " + node.type);
         }
-        System.out.println(symbolTable.get(variableName));
     }
 }

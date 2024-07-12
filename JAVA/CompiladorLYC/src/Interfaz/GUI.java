@@ -109,7 +109,7 @@ public class GUI extends javax.swing.JFrame {
        
 
         if (tokenizacionCorrecta) {
-            textAreaSalida.append("\nTokenización correcta!");
+            textAreaSalida.append("\nTokenización correcta!\n");
 
             Parser parser = new Parser(tokens);
          

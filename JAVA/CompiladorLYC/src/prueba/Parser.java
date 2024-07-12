@@ -17,11 +17,19 @@ public class Parser {
 
     public ASTNode parse() {
         try {
-            return statement();
+            return program();
         } catch (ParseError e) {
             System.err.println(e.getMessage());
             return null;
         }
+    }
+
+    private ASTNode program() {
+        ASTNode root = statement();
+        while (!isAtEnd()) {
+            root = new ASTNode(TokenType.SEMICOLON, ";", root, statement());
+        }
+        return root;
     }
 
     private boolean isAtEnd() {
@@ -95,6 +103,8 @@ public class Parser {
             return declaration();
         } else if (peek().tipo == TokenType.OUTPUT) {
             return handleCoutStatement();
+        } else if (peek().tipo == TokenType.IDENTIFIER) {
+            return assignment();
         } else {
             return expressionStatement();
         }
@@ -107,6 +117,14 @@ public class Parser {
         ASTNode value = expression();
         expect(TokenType.SEMICOLON, "Error: Se esperaba ';' después de la declaración de la variable");
         return new ASTNode(TokenType.DATA_TYPE, keyword.valor, new ASTNode(TokenType.IDENTIFIER, identifier.valor), value);
+    }
+
+    private ASTNode assignment() {
+        Token identifier = expect(TokenType.IDENTIFIER, "Error: Se esperaba un identificador para la asignación");
+        expect(TokenType.OPERATOR, "Error: Se esperaba '=' para la asignación");
+        ASTNode value = expression();
+        expect(TokenType.SEMICOLON, "Error: Se esperaba ';' después de la asignación");
+        return new ASTNode(TokenType.OPERATOR, "=", new ASTNode(TokenType.IDENTIFIER, identifier.valor), value);
     }
 
     private ASTNode expressionStatement() {

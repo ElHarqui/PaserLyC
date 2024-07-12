@@ -20,6 +20,7 @@ public class Interpreter {
         if (node == null) {
             return null;
         }
+
         System.out.println("Evaluando nodo: " + node.type + " con valor: " + node.value);
 
         switch (node.type) {
@@ -36,7 +37,6 @@ public class Interpreter {
                     throw new IllegalArgumentException("Variable no declarada: " + node.value);
                 }
             case DATA_TYPE:
-                if (node.left != null && node.left.type == TokenType.IDENTIFIER && node.right != null) {
                     variableValues.put(node.left.value, evaluate(node.right));
                     return null;
                 } else {
@@ -52,6 +52,13 @@ public class Interpreter {
                         return (int) evaluate(node.left) * (int) evaluate(node.right);
                     case "/":
                         return (int) evaluate(node.left) / (int) evaluate(node.right);
+                    case "=":
+                        if (node.left.type == TokenType.IDENTIFIER) {
+                            variableValues.put(node.left.value, evaluate(node.right));
+                            return null;
+                        } else {
+                            throw new IllegalArgumentException("Asignación incorrecta");
+                        }
                     default:
                         throw new IllegalArgumentException("Operador desconocido: " + node.value);
                 }
@@ -60,8 +67,11 @@ public class Interpreter {
                     System.out.println(evaluate(node.left));
                     return null;
                 }
-                // Otros casos de OUTPUT
                 return node.value;
+            case SEMICOLON:
+                evaluate(node.left);
+                evaluate(node.right);
+                return null;
             default:
                 throw new IllegalArgumentException("Tipo de nodo desconocido: " + node.type);
         }

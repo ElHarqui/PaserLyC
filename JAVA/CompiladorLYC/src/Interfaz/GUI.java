@@ -40,6 +40,9 @@ public class GUI extends javax.swing.JFrame {
         textAreaSalida = new javax.swing.JTextArea();
         jScrollPane4 = new javax.swing.JScrollPane();
         CoutSalida = new javax.swing.JTextArea();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -85,7 +88,7 @@ public class GUI extends javax.swing.JFrame {
         jScrollPane1.setViewportView(textAreaEntrada);
 
         jPanel1.add(jScrollPane1);
-        jScrollPane1.setBounds(40, 70, 270, 160);
+        jScrollPane1.setBounds(40, 90, 270, 170);
 
         textAreaSalida.setEditable(false);
         textAreaSalida.setColumns(20);
@@ -95,14 +98,28 @@ public class GUI extends javax.swing.JFrame {
         jScrollPane2.setViewportView(textAreaSalida);
 
         jPanel1.add(jScrollPane2);
-        jScrollPane2.setBounds(333, 72, 280, 330);
+        jScrollPane2.setBounds(333, 92, 280, 310);
 
+        CoutSalida.setEditable(false);
         CoutSalida.setColumns(20);
         CoutSalida.setRows(5);
+        CoutSalida.setWrapStyleWord(true);
         jScrollPane4.setViewportView(CoutSalida);
 
         jPanel1.add(jScrollPane4);
-        jScrollPane4.setBounds(60, 250, 234, 86);
+        jScrollPane4.setBounds(40, 310, 280, 86);
+
+        jLabel2.setText("Codigo:");
+        jPanel1.add(jLabel2);
+        jLabel2.setBounds(50, 70, 50, 16);
+
+        jLabel3.setText("jLabel3");
+        jPanel1.add(jLabel3);
+        jLabel3.setBounds(350, 70, 37, 16);
+
+        jLabel4.setText("Consola :");
+        jPanel1.add(jLabel4);
+        jLabel4.setBounds(50, 290, 60, 16);
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 500));
 
@@ -159,6 +176,8 @@ public class GUI extends javax.swing.JFrame {
     private void LimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LimpiarActionPerformed
         textAreaEntrada.setText("");
         textAreaSalida.setText("");
+        CoutSalida.setText("");
+        
 
     }//GEN-LAST:event_LimpiarActionPerformed
 
@@ -202,6 +221,9 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton Limpiar;
     private javax.swing.JButton Salir;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

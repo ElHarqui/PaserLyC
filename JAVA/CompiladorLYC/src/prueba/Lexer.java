@@ -31,11 +31,10 @@ public class Lexer {
         keywords.put("cin", TokenType.INPUT);
         
 
-        // Símbolos adicionales
+   
         keywords.put("\"", TokenType.DOUBLE_QUOTE);
 
-        // Añadir más palabras reservadas según sea necesario
-    }
+       }
 
     public Lexer(String source) {
         this.source = source;

@@ -68,6 +68,11 @@ public class Parser {
             expect(TokenType.DELIMITER, "Se esperaba ')'");
             advance(); // Consume ')'
             return node;
+        } else if (!isAtEnd() && (peek().tipo == TokenType.OPERATOR) && (peek().valor.equals("<") || peek().valor.equals(">") || peek().valor.equals("<=") || peek().valor.equals(">=") || peek().valor.equals("==") || peek().valor.equals("!="))) {
+            Token token = advance();
+            ASTNode left = expression();
+            ASTNode right = expression();
+            return new ASTNode(TokenType.OPERATOR, token.valor, left, right);
         } else {
             throw new ParseError("Error: Se esperaba un factor válido");
         }
@@ -87,19 +92,19 @@ public class Parser {
    }
 
     private ASTNode term() {
-        ASTNode node = factor();
-        while (!isAtEnd() && peek().tipo == TokenType.OPERATOR && (peek().valor.equals("*") || peek().valor.equals("/"))) {
-            Token token = advance();
-            ASTNode newNode = new ASTNode(token.tipo, token.valor);
-            newNode.left = node;
-            newNode.right = factor();
-            if (token.valor.equals("/") && newNode.right.value.equals("0")) {
-                throw new ParseError("Error: División por cero detectada");
-            }
-            node = newNode;
-        }
-        return node;
-    }
+       ASTNode node = factor();
+       while (!isAtEnd() && peek().tipo == TokenType.OPERATOR && (peek().valor.equals("*") || peek().valor.equals("/"))) {
+           Token token = advance();
+           ASTNode newNode = new ASTNode(token.tipo, token.valor);
+           newNode.left = node;
+           newNode.right = factor();
+           if (token.valor.equals("/") && newNode.right.value.equals("0")) {
+               throw new ParseError("Error: División por cero detectada");
+           }
+           node = newNode;
+       }
+       return node;
+   }
 
     private ASTNode statement() {
         if (peek().tipo == TokenType.KEYWORD) {

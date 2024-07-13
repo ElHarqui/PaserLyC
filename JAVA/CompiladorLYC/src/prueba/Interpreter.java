@@ -78,6 +78,8 @@ public class Interpreter {
                         return (int) evaluate(node.left) >= (int) evaluate(node.right);
                     case "!=":
                         return !evaluate(node.left).equals(evaluate(node.right));
+                    case "==":
+                        return evaluate(node.left).equals(evaluate(node.right));
                     default:
                         throw new IllegalArgumentException("Operador desconocido: " + node.value);
                 }

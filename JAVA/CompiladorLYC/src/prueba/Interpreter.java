@@ -15,6 +15,7 @@ public class Interpreter {
         this.variableValues = new HashMap<>();
         this.Resultados = new ArrayList<>();
     }
+
     public List<String> getResultados(){
         return this.Resultados;
     }
@@ -67,12 +68,22 @@ public class Interpreter {
                         } else {
                             throw new IllegalArgumentException("Asignación incorrecta");
                         }
+                    case "<":
+                        return (int) evaluate(node.left) < (int) evaluate(node.right);
+                    case ">":
+                        return (int) evaluate(node.left) > (int) evaluate(node.right);
+                    case "<=":
+                        return (int) evaluate(node.left) <= (int) evaluate(node.right);
+                    case ">=":
+                        return (int) evaluate(node.left) >= (int) evaluate(node.right);
+                    case "!=":
+                        return !evaluate(node.left).equals(evaluate(node.right));
                     default:
                         throw new IllegalArgumentException("Operador desconocido: " + node.value);
                 }
             case OUTPUT:
                 if ("cout <<".equals(node.value)) {
-                    this.Resultados.add( String.valueOf(evaluate(node.left)));
+                    this.Resultados.add(String.valueOf(evaluate(node.left)));
                     return null;
                 }
                 return node.value;

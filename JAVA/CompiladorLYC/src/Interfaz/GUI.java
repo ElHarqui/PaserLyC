@@ -68,7 +68,7 @@ public class GUI extends javax.swing.JFrame {
         Salir.setBounds(430, 430, 75, 20);
 
         jLabel1.setFont(new java.awt.Font("Microsoft JhengHei", 1, 24)); // NOI18N
-        jLabel1.setText("Reconocedor de Lenguaje");
+        jLabel1.setText("expresiones aritmeticas");
         jPanel1.add(jLabel1);
         jLabel1.setBounds(190, 20, 340, 40);
 

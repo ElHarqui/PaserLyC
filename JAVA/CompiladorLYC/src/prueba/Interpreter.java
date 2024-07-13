@@ -16,7 +16,7 @@ public class Interpreter {
         this.Resultados = new ArrayList<>();
     }
 
-    public List<String> getResultados(){
+    public List<String> getResultados() {
         return this.Resultados;
     }
 
@@ -91,8 +91,17 @@ public class Interpreter {
                 evaluate(node.left);
                 evaluate(node.right);
                 return null;
+            case LOOP:
+                if ("while".equals(node.value)) {
+                    while ((boolean) evaluate(node.left)) {
+                        evaluate(node.right);
+                    }
+                    return null;
+                }
+                break;
             default:
                 throw new IllegalArgumentException("Tipo de nodo desconocido: " + node.type);
         }
+        return null;
     }
 }

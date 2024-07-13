@@ -143,7 +143,7 @@ public class GUI extends javax.swing.JFrame {
             StringBuilder tokenOutput = new StringBuilder();
 
             for (Token token : tokens) {
-                if (token.equals(parser.getcurrent())) {
+                if (token.equals(parser.getCurrent())) {
                     tokenOutput.append("\nERROR en la posición: ").append(tokenOutput.length()).append("\n").append(token).append("\n");
                     break;
                 }

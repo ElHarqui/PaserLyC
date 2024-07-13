@@ -1,4 +1,3 @@
-
 package prueba;
 
 import java.util.ArrayList;
@@ -29,12 +28,8 @@ public class Lexer {
         keywords.put(">>", TokenType.SHIFT_RIGHT);
         keywords.put("cout", TokenType.OUTPUT);
         keywords.put("cin", TokenType.INPUT);
-        
-
-   
         keywords.put("\"", TokenType.DOUBLE_QUOTE);
-
-       }
+    }
 
     public Lexer(String source) {
         this.source = source;
@@ -119,7 +114,6 @@ public class Lexer {
         StringBuilder value = new StringBuilder();
         value.append(source.charAt(current - 1));
 
-        // Verificar si el siguiente carácter forma un operador doble o triple
         while (!isAtEnd()) {
             String combined = value.toString() + peek();
             if (keywords.containsKey(combined)) {
@@ -129,7 +123,6 @@ public class Lexer {
             }
         }
 
-        // Verificar operadores dobles en palabras clave
         TokenType type = keywords.getOrDefault(value.toString(), TokenType.OPERATOR);
         return new Token(type, value.toString());
     }
@@ -140,14 +133,14 @@ public class Lexer {
             value.append(advance());
         }
         if (!isAtEnd()) {
-            advance(); 
+            advance();
         }
         return new Token(TokenType.STRING, value.toString());
     }
 
     private Token lexPreprocessorDirective() {
         StringBuilder value = new StringBuilder();
-        value.append(source.charAt(current - 1)); 
+        value.append(source.charAt(current - 1));
         while (!isAtEnd() && peek() != '\n') {
             value.append(advance());
         }
@@ -159,5 +152,4 @@ public class Lexer {
             advance();
         }
     }
-
 }

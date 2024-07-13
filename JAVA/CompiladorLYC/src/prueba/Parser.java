@@ -105,6 +105,8 @@ public class Parser {
             return handleCoutStatement();
         } else if (peek().tipo == TokenType.IDENTIFIER) {
             return assignment();
+        } else if (peek().tipo == TokenType.LOOP) {
+            return whileStatement();
         } else {
             return expressionStatement();
         }
@@ -140,7 +142,19 @@ public class Parser {
         expect(TokenType.SEMICOLON, "Error: Se esperaba ';' después de 'cout <<'");
         return new ASTNode(TokenType.OUTPUT, "cout <<", expr);
     }
-    public int getcurrent(){
-        return current;
+
+    private ASTNode whileStatement() {
+        expect(TokenType.LOOP, "Se esperaba 'while'");
+        expect(TokenType.DELIMITER, "Se esperaba '(' después de 'while'");
+        ASTNode condition = expression();
+        expect(TokenType.DELIMITER, "Se esperaba ')' después de la condición del 'while'");
+        expect(TokenType.DELIMITER, "Se esperaba '{' para abrir el bloque del 'while'");
+        ASTNode body = program();
+        expect(TokenType.DELIMITER, "Se esperaba '}' para cerrar el bloque del 'while'");
+        return new ASTNode(TokenType.LOOP, "while", condition, body);
+    }
+
+    public int getCurrent() {
+        return this.current;
     }
 }

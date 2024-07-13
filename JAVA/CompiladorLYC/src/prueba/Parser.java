@@ -51,6 +51,7 @@ public class Parser {
     }
 
     private Token expect(TokenType type, String message) {
+        System.out.println("Expectando token: " + type + " actual: " + peek().tipo + " valor: " + peek().valor);
         if (peek().tipo == type) {
             return advance();
         }
@@ -65,6 +66,7 @@ public class Parser {
             advance(); // Consume '('
             ASTNode node = expression();
             expect(TokenType.DELIMITER, "Se esperaba ')'");
+            advance(); // Consume ')'
             return node;
         } else {
             throw new ParseError("Error: Se esperaba un factor válido");
@@ -72,16 +74,17 @@ public class Parser {
     }
 
     private ASTNode expression() {
-        ASTNode node = term();
-        while (!isAtEnd() && peek().tipo == TokenType.OPERATOR && (peek().valor.equals("+") || peek().valor.equals("-"))) {
-            Token token = advance();
-            ASTNode newNode = new ASTNode(token.tipo, token.valor);
-            newNode.left = node;
-            newNode.right = term();
-            node = newNode;
-        }
-        return node;
-    }
+       System.out.println("Entrando en expression con token: " + peek());
+       ASTNode node = term();
+       while (!isAtEnd() && peek().tipo == TokenType.OPERATOR && (peek().valor.equals("+") || peek().valor.equals("-") || peek().valor.equals("<") || peek().valor.equals(">") || peek().valor.equals("<=") || peek().valor.equals(">="))) {
+           Token token = advance();
+           ASTNode newNode = new ASTNode(token.tipo, token.valor);
+           newNode.left = node;
+           newNode.right = term();
+           node = newNode;
+       }
+       return node;
+   }
 
     private ASTNode term() {
         ASTNode node = factor();
@@ -144,17 +147,53 @@ public class Parser {
     }
 
     private ASTNode whileStatement() {
-        expect(TokenType.LOOP, "Se esperaba 'while'");
-        expect(TokenType.DELIMITER, "Se esperaba '(' después de 'while'");
-        ASTNode condition = expression();
-        expect(TokenType.DELIMITER, "Se esperaba ')' después de la condición del 'while'");
-        expect(TokenType.DELIMITER, "Se esperaba '{' para abrir el bloque del 'while'");
-        ASTNode body = program();
-        expect(TokenType.DELIMITER, "Se esperaba '}' para cerrar el bloque del 'while'");
-        return new ASTNode(TokenType.LOOP, "while", condition, body);
+       System.out.println("Entrando en whileStatement");
+
+       expect(TokenType.LOOP, "Se esperaba 'while'");
+       System.out.println("Después de leer 'while'");
+
+       expect(TokenType.DELIMITER, "Se esperaba '(' después de 'while'");
+       System.out.println("Después de leer '('");
+
+       ASTNode condition = expression();
+       System.out.println("Después de evaluar la condición del 'while': " + condition);
+
+       // Verificar si el siguiente token es ')'
+       if (peek().tipo != TokenType.DELIMITER || !peek().valor.equals(")")) {
+           throw new ParseError("Se esperaba ')' después de la condición del 'while', pero se encontró: " + peek().valor);
+       }
+
+       expect(TokenType.DELIMITER, "Se esperaba ')' después de la condición del 'while'");
+       System.out.println("Después de leer ')'");
+
+       expect(TokenType.DELIMITER, "Se esperaba '{' para abrir el bloque del 'while'");
+       System.out.println("Después de leer '{'");
+
+       ASTNode body = program();
+       System.out.println("Después de evaluar el bloque del 'while'");
+
+       expect(TokenType.DELIMITER, "Se esperaba '}' para cerrar el bloque del 'while'");
+       System.out.println("Después de leer '}'");
+
+       return new ASTNode(TokenType.LOOP, "while", condition, body);
+   }
+
+    private ASTNode block() {
+        ASTNode root = null;
+        while (!isAtEnd() && !peek().valor.equals("}")) {
+            System.out.println("En block, evaluando statement");
+            ASTNode statement = statement();
+            if (root == null) {
+                root = statement;
+            } else {
+                root = new ASTNode(TokenType.SEMICOLON, ";", root, statement);
+            }
+        }
+        return root;
     }
+    
 
     public int getCurrent() {
-        return this.current;
+        return current;
     }
 }

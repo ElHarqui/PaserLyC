@@ -36,37 +36,38 @@ public class Lexer {
         this.current = 0;
     }
 
-    public List<Token> tokenize() {
-        List<Token> tokens = new ArrayList<>();
-        while (!isAtEnd()) {
-            skipWhitespace();
-            if (isAtEnd()) {
-                break;
-            }
-            char c = advance();
-            if (Character.isDigit(c)) {
-                tokens.add(lexNumber());
-            } else if (Character.isLetter(c)) {
-                tokens.add(lexIdentifierOrKeyword());
-            } else if ("+-*/=><!".indexOf(c) >= 0) {
-                tokens.add(lexOperator());
-            } else if (c == ';') {
-                tokens.add(new Token(TokenType.SEMICOLON, ";"));
-            } else if (c == '(' || c == ')') {
-                tokens.add(new Token(TokenType.DELIMITER, String.valueOf(c)));
-            } else if (c == '{' || c == '}') {
-                tokens.add(new Token(TokenType.DELIMITER, String.valueOf(c)));
-            } else if (c == '"') {
-                tokens.add(lexString());
-            } else if (c == '#') {
-                tokens.add(lexPreprocessorDirective());
-            } else {
-                tokens.add(new Token(TokenType.UNKNOWN, String.valueOf(c)));
-            }
+public List<Token> tokenize() {
+    List<Token> tokens = new ArrayList<>();
+    while (!isAtEnd()) {
+        skipWhitespace();
+        if (isAtEnd()) {
+            break;
         }
-        tokens.add(new Token(TokenType.END_OF_FILE, ""));
-        return tokens;
+        char c = advance();
+        if (Character.isDigit(c)) {
+            tokens.add(lexNumber());
+        } else if (Character.isLetter(c)) {
+            tokens.add(lexIdentifierOrKeyword());
+        } else if ("+-*/=><!".indexOf(c) >= 0) {
+            tokens.add(lexOperator());
+        } else if (c == ';') {
+            tokens.add(new Token(TokenType.SEMICOLON, ";"));
+        } else if (c == '(' || c == ')' || c == '{' || c == '}') {
+            Token delimiter = lexDelimiter();
+            if (delimiter != null) {
+                tokens.add(delimiter);
+            }
+        } else if (c == '"') {
+            tokens.add(lexString());
+        } else if (c == '#') {
+            tokens.add(lexPreprocessorDirective());
+        } else {
+            tokens.add(new Token(TokenType.UNKNOWN, String.valueOf(c)));
+        }
     }
+    tokens.add(new Token(TokenType.END_OF_FILE, ""));
+    return tokens;
+}
 
     private boolean isAtEnd() {
         return current >= source.length();
@@ -151,5 +152,12 @@ public class Lexer {
         while (!isAtEnd() && Character.isWhitespace(peek())) {
             advance();
         }
+    }
+    private Token lexDelimiter() {
+        char currentChar = source.charAt(current - 1);
+        if (currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}') {
+            return new Token(TokenType.DELIMITER, String.valueOf(currentChar));
+        }
+        return null;
     }
 }
